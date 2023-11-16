@@ -21,7 +21,10 @@ Suggests:
     BiocStyle,
     knitr,
     rmarkdown
+biocViews: Software, Infrastructure, DataImport, SingleCell
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+BugReports: https://github.com/waldronlab/VisiumIO/issues
+URL: https://github.com/waldronlab/VisiumIO
