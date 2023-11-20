@@ -6,7 +6,7 @@
 \alias{.TENxVisium}
 \alias{TENxVisium}
 \alias{import,TENxVisium,ANY,ANY-method}
-\title{A class to represent and import a Single Visium Sample}
+\title{A class to represent and import a single Visium Sample}
 \usage{
 TENxVisium(
   resources,
