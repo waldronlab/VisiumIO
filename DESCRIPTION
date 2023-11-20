@@ -20,7 +20,8 @@ Imports:
 Suggests:
     BiocStyle,
     knitr,
-    rmarkdown
+    rmarkdown,
+    tinytest
 biocViews: Software, Infrastructure, DataImport, SingleCell
 VignetteBuilder: knitr
 Encoding: UTF-8
