@@ -1,0 +1,194 @@
+---
+title: "VisiumIO: Import 10X Genomics Visium Experiment Data"
+author: "Marcel Ramos"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{VisiumIO Quick Start Guide}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    number_sections: no
+    toc: yes
+    toc_depth: 4
+Package: VisiumIO
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+# Introduction
+
+The `VisiumIO` package provides a set of functions to import 10X Genomics Visium
+experiment data into a `SpatialExperiment` object. The package makes use of the
+`SpatialExperiment` data structure, which provides a set of classes and
+methods to handle spatially resolved transcriptomics data.
+
+# TENxIO Supported Formats
+
+| **Extension**       | **Class**     | **Imported as**      |
+|---------------------|---------------|----------------------|
+| .h5                 | TENxH5        | SingleCellExperiment w/ TENxMatrix |
+| .mtx / .mtx.gz      | TENxMTX       | SummarizedExperiment w/ dgCMatrix |
+| .tar.gz             | TENxFileList  | SingleCellExperiment w/ dgCMatrix |
+| peak_annotation.tsv | TENxPeaks     | GRanges              |
+| fragments.tsv.gz    | TENxFragments | RaggedExperiment     |
+| .tsv / .tsv.gz      | TENxTSV       | tibble               |
+
+# VisiumIO Supported Formats
+
+| **Extension**       | **Class**     | **Imported as**      |
+|---------------------|---------------|----------------------|
+| spatial.tar.gz      | TENxSpatialList | inter. DataFrame list |
+
+# Installation
+
+```{r,eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("VisiumIO")
+```
+
+# Loading package
+
+```{r,include=TRUE,results="hide",message=FALSE,warning=FALSE}
+library(VisiumIO)
+```
+
+# TENxVisium
+
+The `TENxVisium` class is used to import a **single** sample of 10X Visium data.
+The `TENxVisium` constructor function takes the following arguments:
+
+```{r,eval=FALSE}
+TENxVisium(
+    resources = "path/to/10x/visium/file.tar.gz",
+    spatialResource = "path/to/10x/visium/spatial/file.spatial.tar.gz",
+    spacerangerOut = "path/to/10x/visium/sample/folder",
+    sample_id = "sample01",
+    images = c("lowres", "hires", "detected", "aligned"),
+    jsonFile = "scalefactors_json.json",
+    tissuePattern = "tissue_positions.*\\.csv",
+    spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres")
+)
+```
+
+The `resource` argument is the path to the 10X Visium file. The `spatialResource`
+argument is the path to the 10X Visium spatial file. It usually ends in
+`spatial.tar.gz`.
+
+## Example from SpatialExperiment
+
+Note that we use the `image = "lowres"` and `processing = "raw"` arguments based
+on the name of the `tissue_*_image.png` file and `*_feature_bc_matrix` folder in
+the `spaceranger` output. The directory structure for a **single** sample is
+shown below:
+
+```
+    section1
+    └── outs
+        ├── spatial
+        │   ├── tissue_lowres_image.png
+        │   └── tissue_positions_list.csv
+        └── raw_feature_bc_matrix
+            ├── barcodes.tsv
+            ├── features.tsv
+            └── matrix.mtx
+```
+
+### Creating a TENxVisium instance
+
+Using the example data in `SpatialExperiment`, we can load the `section1`
+sample using `TENxVisium`.
+
+```{r}
+sample_dir <- system.file(
+    file.path("extdata", "10xVisium", "section1"),
+    package = "SpatialExperiment"
+)
+
+vis <- TENxVisium(
+    spacerangerOut = sample_dir, processing = "raw", images = "lowres"
+)
+vis
+```
+
+The show method of the `TENxVisium` class displays the object's metadata.
+
+### Importing into SpatialExperiment
+
+The `TEnxVisium` object can be imported into a `SpatialExperiment` object using
+the `import` function.
+
+```{r}
+import(vis)
+```
+
+# TENxVisiumList
+
+The `TENxVisiumList` class is used to import multiple samples of 10X Visium.
+The interface is a bit more simple in that you only need to provide the
+`space ranger` output folder as input to the function.
+
+```{r,eval=FALSE}
+TENxVisiumList(
+    sampleFolders = "path/to/10x/visium/sample/folder",
+    sample_ids = c("sample01", "sample02"),
+    ...
+)
+```
+
+The `sampleFolders` argument is a character vector of paths to the `spaceranger`
+output folder. Note that each folder must contain an `outs` directory. The
+`sample_ids` argument is a character vector of sample ids.
+
+## Example from SpatialExperiment
+
+The directory structure for **multiple** samples (`section1` and `section2`) is
+shown below:
+
+```
+    section1
+    └── outs
+    |   ├── spatial
+    |   └── raw_feature_bc_matrix
+    section2
+    └── outs
+        ├── spatial
+        └── raw_feature_bc_matrix
+```
+
+### Creating a TENxVisiumList
+
+The main inputs to `TENxVisiumList` are the `sampleFolders` and `sample_ids`.
+These correspond to the `spaceranger` output sample folders and a vector
+of sample identifiers, respectively.
+
+```{r}
+sample_dirs <- list.dirs(
+    system.file(
+        file.path("extdata", "10xVisium"), package = "SpatialExperiment"
+    ),
+    recursive = FALSE, full.names = TRUE
+)
+    
+vlist <- TENxVisiumList(
+    sampleFolders = sample_dirs,
+    sample_ids = basename(sample_dirs),
+    processing = "raw",
+    image = "lowres"
+)
+vlist
+```
+
+### Importing into SpatialExperiment
+
+The `import` method combines both `SingleCellExperiment` objects along with the
+spatial information into a single `SpatialExperiment` object. The number of
+columns in the SpatialExperiment object is equal to the number of cells across
+both samples (`section1` and `section2`).
+
+```{r}
+import(vlist)
+```
