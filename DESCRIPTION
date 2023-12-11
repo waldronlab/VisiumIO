@@ -13,6 +13,7 @@ Imports:
     BiocBaseUtils,
     BiocGenerics,
     BiocIO,
+    jsonlite,
     methods,
     S4Vectors,
     SpatialExperiment,
