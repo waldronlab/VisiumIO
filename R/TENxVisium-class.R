@@ -37,41 +37,51 @@
     )
 )
 
+.FEATURE_BC_MATRIX_FILES <- c("barcodes.tsv", "features.tsv", "matrix.mtx")
+
+.FEATURE_BC_MATRIX_FILES_PRINT <- paste0(
+    sQuote(.FEATURE_BC_MATRIX_FILES), collapse = ", "
+)
+
 #' @importFrom TENxIO TENxFileList
 .find_convert_resources <- function(path, processing, ...) {
-    odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-    fdirname <- paste0(processing, "_feature_bc_matrix")
-    featdir <- file.path(odir, fdirname)
-    if (endsWith(odir, "outs") && dir.exists(featdir))
-        path <- featdir
-    else
-        stop(
-            "The 'outs' or '", fdirname, "' directory was not found.",
-            "\n  Verify 'spacerangerOut' and 'processing' inputs.",
-            call. = FALSE
+    if (!is(path, "TENxFileList")) {
+        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+        fdirname <- paste0(processing, "_feature_bc_matrix")
+        featdir <- file.path(odir, fdirname)
+        if (
+            identical(length(odir), 1L) && endsWith(odir, "outs") &&
+            identical(length(featdir), 1L) && dir.exists(featdir)
         )
-
-    if (!is(path, "TENxFileList"))
-        resources <- TENxFileList(path, ...)
-    else
-        resources <- path
-
-    resources
+            path <- featdir
+        else
+            stop(
+                "The 'outs' or '", fdirname, "' directory was not found.",
+                "\n  Verify 'spacerangerOut' and 'processing' inputs.",
+                call. = FALSE
+            )
+    } else {
+        if (!all(.FEATURE_BC_MATRIX_FILES %in% names(path)))
+            stop(
+                "'TENxFileList' does not contain the expected files:\n  ",
+                .FEATURE_BC_MATRIX_FILES_PRINT
+            )
+        path <- path[.FEATURE_BC_MATRIX_FILES]
+    }
+    TENxFileList(path, ...)
 }
 
 .find_convert_spatial <- function(path, ...) {
-    odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-    if (endsWith(odir, "outs"))
-        path <- file.path(odir, "spatial")
-    else
-        stop("The 'outs' directory was not found")
-
-    if (!is(path, "TENxSpatialList"))
-        spatialList <- TENxSpatialList(path, ...)
-    else
-        spatialList <- path
-
-    spatialList
+    if (!is(path, "TENxFileList")) {
+        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+        if (endsWith(odir, "outs"))
+            path <- file.path(odir, "spatial")
+        else
+            stop("The 'outs' directory was not found")
+    } else {
+        path <- path[!names(path) %in% .FEATURE_BC_MATRIX_FILES]
+    }
+    TENxSpatialList(path, ...)
 }
 
 #' @rdname TENxVisium-class
@@ -140,9 +150,10 @@ TENxVisium <- function(
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
     if (!missing(spacerangerOut)) {
-        stopifnot(
-            isScalarCharacter(spacerangerOut), dir.exists(spacerangerOut)
-        )
+        if (isScalarCharacter(spacerangerOut))
+            stopifnot(
+                dir.exists(spacerangerOut)
+            )
         resources <- .find_convert_resources(spacerangerOut, processing, ...)
         spatialResource <- .find_convert_spatial(
             path = spacerangerOut, sample_id = sample_id, images = images,

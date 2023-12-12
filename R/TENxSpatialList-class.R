@@ -24,7 +24,7 @@
     )
 )
 
-.check_file <- function(obj, pattern) {
+.check_file_pattern <- function(obj, pattern) {
     fname <- switch(
         pattern,
         "positions.*\\.csv$" = "tissue positions",
@@ -36,9 +36,17 @@
         paste0("The '", fname, "' file was not found")
 }
 
+.check_file <- function(obj, filename) {
+    if (filename %in% names(obj))
+        TRUE
+    else
+        paste0("The '", filename, "' file was not found")
+}
+
 .validTENxSpatialList <- function(object) {
-    .check_file(object, "positions.*\\.csv$")
-    .check_file(object, "scalefactors.*\\.json$")
+    .check_file_pattern(object, "positions.*\\.csv$")
+    .check_file_pattern(object, "scalefactors.*\\.json$")
+    .check_file(object, object@scaleJSON)
 }
 
 S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
@@ -68,10 +76,11 @@ TENxSpatialList <- function(
     sample_id = "sample01",
     images = c("lowres", "hires", "detected", "aligned"),
     jsonFile = .SCALE_JSON_FILE,
-    tissuePattern = "tissue_positions.*\\.csv"
+    tissuePattern = "tissue_positions.*\\.csv",
+    ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
-    spatf <- TENxFileList(resources)
+    spatf <- TENxFileList(resources, ...)
     if (spatf@compressed)
         spatf <- decompress(con = spatf)
     tissuePos <- grep(tissuePattern, names(spatf), value = TRUE)
@@ -94,7 +103,7 @@ TENxSpatialList <- function(
 setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     jsonFile <- con@scaleJSON
     sampid <- con@sampleId
-    sfs <- jsonlite::fromJSON(txt = path(con[jsonFile]))
+    sfs <- jsonlite::fromJSON(txt = path(con)[jsonFile])
 
     DFs <- lapply(con@images, function(image) {
         .getImgRow(con = con, sampleId = sampid, image = image, scaleFx = sfs)
@@ -118,7 +127,10 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     imgFile <- grep(image, fileNames, value = TRUE)
     imgPath <- filePaths[endsWith(filePaths, imgFile)]
     if (!length(imgPath))
-        stop("Image: ", image, " not found in list of file names")
+        stop(
+            "The '", image, "' image was not found in the list of file names.",
+            call. = FALSE
+        )
     spi <- SpatialExperiment::SpatialImage(imgPath)
     scaleName <- grep(image, names(scaleFx), value = TRUE)
     if (length(scaleName))

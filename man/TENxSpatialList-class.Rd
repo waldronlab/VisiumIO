@@ -13,7 +13,8 @@ TENxSpatialList(
   sample_id = "sample01",
   images = c("lowres", "hires", "detected", "aligned"),
   jsonFile = .SCALE_JSON_FILE,
-  tissuePattern = "tissue_positions.*\\\\.csv"
+  tissuePattern = "tissue_positions.*\\\\.csv",
+  ...
 )
 
 \S4method{import}{TENxSpatialList,ANY,ANY}(con, format, text, ...)
@@ -33,6 +34,8 @@ JSON file containing the scale factors.}
 \item{tissuePattern}{\code{character(1)} A single string specifying the pattern
 to match the tissue positions file.}
 
+\item{...}{Parameters to pass to the format-specific method.}
+
 \item{con}{The connection from which data is loaded or to which data is
 saved. If this is a \code{character} vector, it is assumed to be a file name and
 a corresponding file connection is created and then closed after exporting
@@ -46,8 +49,6 @@ unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
 
 \item{text}{If \code{con} is missing, this can be a character vector directly
 providing the string data to import.}
-
-\item{...}{Parameters to pass to the format-specific method.}
 }
 \value{
 A \code{SpatialExperiment} object
