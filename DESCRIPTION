@@ -6,7 +6,9 @@ Authors@R:
            comment = c(ORCID = "0000-0002-3242-0582"))
 Description: The package allows users to readily import spatial data obtained
     from either the 10X website or from the Space Ranger pipeline.
-    It generally represents data as a SpatialExperiment object.
+    Supported formats include tar.gz, h5, and mtx files. Multiple files
+    can be imported at once with *List type of functions. The package
+    represents data mainly as SpatialExperiment objects.
 License: Artistic-2.0
 Depends: R (>= 4.4.0), TENxIO
 Imports:
@@ -23,7 +25,7 @@ Suggests:
     knitr,
     rmarkdown,
     tinytest
-biocViews: Software, Infrastructure, DataImport, SingleCell
+biocViews: Software, Infrastructure, DataImport, SingleCell, Spatial
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

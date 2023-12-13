@@ -192,3 +192,10 @@ both samples (`section1` and `section2`).
 ```{r}
 import(vlist)
 ```
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
