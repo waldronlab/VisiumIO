@@ -53,3 +53,50 @@ expect_true(
 expect_true(
     is(import(tv), "SpatialExperiment")
 )
+
+expect_error(
+    TENxVisium(
+        spacerangerOut = TENxFileList(file.path(sample_dir, "outs/spatial")),
+        processing = "raw",
+        images = "lowres",
+        sample_id = "sample01"
+    )
+)
+
+tv <- TENxVisium(
+    resources = file.path(sample_dir, "outs/raw_feature_bc_matrix"),
+    spatialResource = file.path(sample_dir, "outs/spatial"),
+    images = "lowres",
+    sample_id = "sample01"
+)
+
+expect_true(
+    validObject(tv)
+)
+expect_true(
+    is(import(tv), "SpatialExperiment")
+)
+expect_identical(
+    dim(import(tv)),
+    c(50L, 50L)
+)
+
+expect_error(
+    VisiumIO:::.TENxVisium(
+        resources = file.path(sample_dir, "outs/raw_feature_bc_matrix"),
+        spatialList =  TENxSpatialList(file.path(sample_dir, "outs/spatial")),
+        coordNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+        sampleId = "sample01"
+    )
+)
+
+expect_error(
+    VisiumIO:::.TENxVisium(
+        resources = TENxFileList(
+            file.path(sample_dir, "outs/raw_feature_bc_matrix")
+        ),
+        spatialList =  file.path(sample_dir, "outs/spatial"),
+        coordNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+        sampleId = "sample01"
+    )
+)
