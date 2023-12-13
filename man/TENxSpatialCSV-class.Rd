@@ -34,6 +34,12 @@ providing the string data to import.}
 
 \item{...}{Additional inputs to the low level class generator functions}
 }
+\value{
+TENxSpatialCSV: An object of class \link{TENxSpatialCSV}
+
+import-method: A \code{DataFrame} object containing the data from the CSV
+file
+}
 \description{
 \code{TENxSpatialCSV} is a class to represent and import spatial CSV
 files with specific column names. It is a composed class of
@@ -56,3 +62,16 @@ of file}
 \item{\code{colnames}}{\code{character()} A vector specifying the column names of the CSV}
 }}
 
+\examples{
+sample_dir <- system.file(
+    file.path("extdata", "10xVisium", "section1"),
+    package = "SpatialExperiment"
+)
+spatial_dir <- Filter(
+  function(x) endsWith(x, "spatial"), list.dirs(sample_dir)
+)
+csvresource <- file.path(spatial_dir, "tissue_positions_list.csv")
+TENxSpatialCSV(csvresource)
+head(import(TENxSpatialCSV(csvresource)), 4)
+
+}

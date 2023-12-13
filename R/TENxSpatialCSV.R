@@ -48,6 +48,20 @@
 #' @importFrom TENxIO TENxFile
 #' @importFrom BiocGenerics path
 #'
+#' @return TENxSpatialCSV: An object of class [TENxSpatialCSV]
+#'
+#' @examples
+#' sample_dir <- system.file(
+#'     file.path("extdata", "10xVisium", "section1"),
+#'     package = "SpatialExperiment"
+#' )
+#' spatial_dir <- Filter(
+#'   function(x) endsWith(x, "spatial"), list.dirs(sample_dir)
+#' )
+#' csvresource <- file.path(spatial_dir, "tissue_positions_list.csv")
+#' TENxSpatialCSV(csvresource)
+#' head(import(TENxSpatialCSV(csvresource)), 4)
+#'
 #' @export
 TENxSpatialCSV <- function(resource, colnames = .TISSUE_POS_COLS) {
     if (!is(resource, "TENxFile"))
@@ -61,6 +75,9 @@ TENxSpatialCSV <- function(resource, colnames = .TISSUE_POS_COLS) {
 #' @rdname TENxSpatialCSV-class
 #'
 #' @inheritParams BiocIO::import
+#'
+#' @return import-method: A `DataFrame` object containing the data from the CSV
+#'   file
 #'
 #' @importFrom S4Vectors DataFrame
 #' @exportMethod import
