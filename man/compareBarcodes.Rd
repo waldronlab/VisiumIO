@@ -14,11 +14,11 @@ compareBarcodes(
 }
 \arguments{
 \item{raw_filt_resources}{\code{character(2)} A vector of length 2, where the
-first element is the path to the raw resources and the second element is
-the path to the filtered resources. If the resources are already converted
-to \code{TENxFileList} objects, then this argument can be a list of length 2,
-where the first element is the raw resources and the second element is the
-filtered resources.}
+first element is the path to the \strong{raw} resources and the second element
+is the path to the \strong{filtered} resources. If the resources are already
+converted to \code{TENxFileList} objects, then this argument can be a list of
+length 2, where the first element is the raw resources and the second
+element is the filtered resources.}
 
 \item{spacerangerOut}{\code{character(1)} A scalar vector specifying the path
 to the \code{spaceranger} output directory.}
@@ -26,7 +26,10 @@ to the \code{spaceranger} output directory.}
 \item{processing}{\code{character(2)} A vector of length 2 that corresponds to the
 processing type. The processing types are typically "raw" and "filtered".
 These are the prefixes of the folder names \code{raw_feature_bc_matrix} and
-\code{filtered_feature_bc_matrix}.}
+\code{filtered_feature_bc_matrix}. The order of the vector determines the
+comparison. For example, if \code{processing = c("raw", "filtered")}, then the
+barcodes in the raw data are compared to the filtered data. Default is
+\code{c("raw", "filtered")}.}
 
 \item{outs}{\code{character(1)} A single string specifying the name of the
 \code{spaceranger} output directory. Default is "outs".}
@@ -41,7 +44,10 @@ indicating whether the barcodes are found in the \code{filtered} data.
 }
 \description{
 This function compares the barcodes between raw and filtered
-data \strong{depending} on the order of \code{processing}.
+data \strong{depending} on the order of \code{processing}. Typically, the "raw"
+barcodes are compared to the "filtered" ones. The presence of raw
+barcodes in the filtered data are marked as \code{TRUE} in the resulting
+\code{data.frame}.
 }
 \examples{
 if (interactive()) {
@@ -52,6 +58,7 @@ if (interactive()) {
         ),
         processing = c("raw", "filtered"),
         outs = "outs"
-    ) |> head()
+    ) |>
+    head()
 }
 }

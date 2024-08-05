@@ -13,14 +13,17 @@
 #' Compare barcodes between raw and filtered data
 #'
 #' @description This function compares the barcodes between raw and filtered
-#'  data **depending** on the order of `processing`.
+#'  data **depending** on the order of `processing`. Typically, the "raw"
+#'  barcodes are compared to the "filtered" ones. The presence of raw
+#'  barcodes in the filtered data are marked as `TRUE` in the resulting
+#'  `data.frame`.
 #'
 #' @param raw_filt_resources `character(2)` A vector of length 2, where the
-#'   first element is the path to the raw resources and the second element is
-#'   the path to the filtered resources. If the resources are already converted
-#'   to `TENxFileList` objects, then this argument can be a list of length 2,
-#'   where the first element is the raw resources and the second element is the
-#'   filtered resources.
+#'   first element is the path to the **raw** resources and the second element
+#'   is the path to the **filtered** resources. If the resources are already
+#'   converted to `TENxFileList` objects, then this argument can be a list of
+#'   length 2, where the first element is the raw resources and the second
+#'   element is the filtered resources.
 #'
 #' @param spacerangerOut `character(1)` A scalar vector specifying the path
 #'   to the `spaceranger` output directory.
@@ -28,7 +31,10 @@
 #' @param processing `character(2)` A vector of length 2 that corresponds to the
 #'   processing type. The processing types are typically "raw" and "filtered".
 #'   These are the prefixes of the folder names `raw_feature_bc_matrix` and
-#'   `filtered_feature_bc_matrix`.
+#'   `filtered_feature_bc_matrix`. The order of the vector determines the
+#'   comparison. For example, if `processing = c("raw", "filtered")`, then the
+#'   barcodes in the raw data are compared to the filtered data. Default is
+#'   `c("raw", "filtered")`.
 #'
 #' @param outs `character(1)` A single string specifying the name of the
 #'   `spaceranger` output directory. Default is "outs".
@@ -49,7 +55,8 @@
 #'         ),
 #'         processing = c("raw", "filtered"),
 #'         outs = "outs"
-#'     )
+#'     ) |>
+#'     head()
 #' }
 #' @export
 compareBarcodes <- function(
