@@ -30,23 +30,21 @@
         "positions.*\\.csv$" = "tissue positions",
         "scalefactors.*\\.json$" = "scalefactor JSON"
     )
-    if (any(grepl(pattern, names(obj))))
-        TRUE
-    else
+    if (!any(grepl(pattern, names(obj))))
         paste0("The '", fname, "' file was not found")
 }
 
 .check_file <- function(obj, filename) {
-    if (filename %in% names(obj))
-        TRUE
-    else
+    if (!filename %in% names(obj))
         paste0("The '", filename, "' file was not found")
 }
 
 .validTENxSpatialList <- function(object) {
-    .check_file_pattern(object, "positions.*\\.csv$")
-    .check_file_pattern(object, "scalefactors.*\\.json$")
-    .check_file(object, object@scaleJSON)
+    c(
+        .check_file_pattern(object, "positions.*\\.csv$"),
+        .check_file_pattern(object, "scalefactors.*\\.json$"),
+        .check_file(object, object@scaleJSON)
+    )
 }
 
 S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
