@@ -27,7 +27,7 @@
 .check_file_pattern <- function(obj, pattern) {
     fname <- switch(
         pattern,
-        "positions.*\\.csv$" = "tissue positions",
+        "tissue_positions.*" = "tissue positions",
         "scalefactors.*\\.json$" = "scalefactor JSON"
     )
     if (!any(grepl(pattern, names(obj))))
@@ -41,7 +41,7 @@
 
 .validTENxSpatialList <- function(object) {
     c(
-        .check_file_pattern(object, "positions.*\\.csv$"),
+        .check_file_pattern(object, "tissue_positions.*"),
         .check_file_pattern(object, "scalefactors.*\\.json$"),
         .check_file(object, object@scaleJSON)
     )
@@ -74,7 +74,7 @@ TENxSpatialList <- function(
     sample_id = "sample01",
     images = c("lowres", "hires", "detected", "aligned"),
     jsonFile = .SCALE_JSON_FILE,
-    tissuePattern = "tissue_positions.*\\.csv",
+    tissuePattern = "tissue_positions.*",
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)

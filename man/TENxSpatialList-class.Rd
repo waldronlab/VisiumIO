@@ -13,7 +13,7 @@ TENxSpatialList(
   sample_id = "sample01",
   images = c("lowres", "hires", "detected", "aligned"),
   jsonFile = .SCALE_JSON_FILE,
-  tissuePattern = "tissue_positions.*\\\\.csv",
+  tissuePattern = "tissue_positions.*",
   ...
 )
 
