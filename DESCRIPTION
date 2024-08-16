@@ -14,13 +14,14 @@ Depends: R (>= 4.4.0), TENxIO
 Imports:
     BiocBaseUtils,
     BiocGenerics,
-    BiocIO,
+    BiocIO (>= 1.15.1),
     jsonlite,
     methods,
     S4Vectors,
     SpatialExperiment,
     SummarizedExperiment
 Suggests:
+    arrow,
     BiocStyle,
     knitr,
     rmarkdown,
@@ -32,4 +33,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 BugReports: https://github.com/waldronlab/VisiumIO/issues
 URL: https://github.com/waldronlab/VisiumIO
+Collate:
+    'TENxSpatialCSV.R'
+    'TENxSpatialList-class.R'
+    'TENxSpatialParquet.R'
+    'TENxVisium-class.R'
+    'TENxVisiumList-class.R'
+    'TENxVisiumHD-class.R'
 Date: 2024-08-22

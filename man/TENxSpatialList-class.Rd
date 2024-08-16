@@ -11,7 +11,7 @@
 TENxSpatialList(
   resources,
   sample_id = "sample01",
-  images = c("lowres", "hires", "detected", "aligned"),
+  images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
   ...

@@ -72,7 +72,7 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 TENxSpatialList <- function(
     resources,
     sample_id = "sample01",
-    images = c("lowres", "hires", "detected", "aligned"),
+    images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
     ...
@@ -97,6 +97,8 @@ TENxSpatialList <- function(
 #'
 #' @inheritParams BiocIO::import
 #'
+#' @importFrom BiocIO FileForFormat
+#'
 #' @exportMethod import
 setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     jsonFile <- con@scaleJSON
@@ -111,8 +113,9 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
             do.call(rbind, DFs)
         ),
         colData = import(
-            TENxSpatialCSV(
-                path(con)[con@tissuePos]
+            FileForFormat(
+                path(con)[con@tissuePos],
+                prefix = "TENxSpatial", suffix = NULL
             )
         )
     )
