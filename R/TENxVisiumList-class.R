@@ -16,7 +16,7 @@
 #'
 #' @seealso <https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/output/overview>
 #'
-#' @exportClass TENxVisium
+#' @exportClass TENxVisiumList
 .TENxVisiumList <- setClass(
     Class = "TENxVisiumList",
     slots = c(
