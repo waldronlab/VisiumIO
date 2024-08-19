@@ -155,5 +155,5 @@ TENxVisiumHD <- function(
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     SElist <- lapply(con@VisiumList, import)
-    do.call(cbind, SEList)
+    do.call(cbind, SElist)
 })
