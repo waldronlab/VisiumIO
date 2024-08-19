@@ -111,7 +111,7 @@ TENxVisiumHD <- function(
         resources <- .find_convert_resources_hd(
             spacerangerOut, processing, bin_size, ...
         )
-        spatialResources <- .find_convert_spatial_hd(
+        spatialResource <- .find_convert_spatial_hd(
             path = spacerangerOut, bin_size = bin_size, sample_id = sample_id,
             images = images, jsonFile = jsonFile, tissuePattern = tissuePattern
         )
@@ -136,7 +136,7 @@ TENxVisiumHD <- function(
     txvList <- mapply(
         .TENxVisium,
         resources = resources,
-        spatialList = spatialResources,
+        spatialList = spatialResource,
         MoreArgs = list(
             coordNames = spatialCoordsNames,
             sampleId = sample_id

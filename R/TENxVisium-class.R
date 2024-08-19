@@ -203,6 +203,7 @@ S4Vectors::setValidity2("TENxVisium", .validTENxVisium)
 #' @inheritParams BiocIO::import
 #'
 #' @importFrom BiocIO import
+#' @importFrom BiocBaseUtils checkInstalled
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SummarizedExperiment assays rowData colData
 #'
@@ -212,18 +213,33 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]
     spd <- slist[["colData"]]
+    is_tbl_df <- inherits(spd, "tbl_df")
+    if (is_tbl_df)
+        rownames <- spd[["barcode"]]
+    else
+        rownames <- rownames(spd)
     matches <- intersect(
         colnames(sce),
-        rownames(spd)
+        rownames
     )
-    spd <- spd[matches, ]
+
+    if (!length(matches))
+        stop("No matching barcodes found between spatial and expression data.")
+
+    if (is_tbl_df) {
+        checkInstalled("dplyr")
+        spd <- dplyr::filter(spd, barcode %in% matches)
+    } else {
+        spd <- spd[matches, ]
+    }
+
     sce <- sce[, matches]
 
     SpatialExperiment::SpatialExperiment(
         assays = assays(sce),
         rowData = S4Vectors::DataFrame(Symbol = rowData(sce)[["Symbol"]]),
         sample_id = con@sampleId,
-        colData = spd,
+        colData = as(spd, "DataFrame"),
         spatialCoordsNames = con@coordNames,
         imgData = img
     )
