@@ -1,8 +1,8 @@
 Package: VisiumIO
 Title: Import Visium data from the 10X Space Ranger pipeline
-Version: 1.1.1
+Version: 1.1.2
 Authors@R:
-    person("Marcel", "Ramos", , "marcel.ramos@roswellpark.org", role = c("aut", "cre"),
+    person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3242-0582"))
 Description: The package allows users to readily import spatial data obtained
     from either the 10X website or from the Space Ranger pipeline.
@@ -32,3 +32,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 BugReports: https://github.com/waldronlab/VisiumIO/issues
 URL: https://github.com/waldronlab/VisiumIO
+Date: 2024-08-22
