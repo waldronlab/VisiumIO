@@ -20,7 +20,8 @@
         images = "character",
         scaleJSON = "character",
         tissuePos = "character",
-        sampleId = "character"
+        sampleId = "character",
+        resolution = "character"
     )
 )
 
@@ -66,7 +67,7 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #'     package = "SpatialExperiment"
 #' )
 #'
-#' TENxSpatialList(resources = spatial_dir)
+#' TENxSpatialList(resources = spatial_dir, images = "lowres")
 #'
 #' @export
 TENxSpatialList <- function(
@@ -75,6 +76,7 @@ TENxSpatialList <- function(
     images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
+    resolution = character(0L),
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -85,9 +87,13 @@ TENxSpatialList <- function(
     if (!length(tissuePos))
         stop("No tissue positions file found with pattern: ", tissuePattern)
 
+    if (missing(resolution) && grepl("square_\\d{3}", resources))
+        resolution <- gsub(".*?square_(\\d{3}).*", "\\1", resources)
+
     .TENxSpatialList(
         spatf, images = images, scaleJSON = jsonFile,
-        tissuePos = tissuePos, sampleId = sample_id
+        tissuePos = tissuePos, sampleId = sample_id,
+        resolution = resolution
     )
 }
 
@@ -108,16 +114,18 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     DFs <- lapply(con@images, function(image) {
         .getImgRow(con = con, sampleId = sampid, image = image, scaleFx = sfs)
     })
+    fff <- FileForFormat(
+        path(con)[con@tissuePos],
+        prefix = "TENxSpatial", suffix = NULL
+    )
+    ffcolData <- import(fff)
+    if (length(con@resolution))
+        ffcolData[["resolution"]] <- con@resolution
     list(
         imgData = DataFrame(
             do.call(rbind, DFs)
         ),
-        colData = import(
-            FileForFormat(
-                path(con)[con@tissuePos],
-                prefix = "TENxSpatial", suffix = NULL
-            )
-        )
+        colData = ffcolData
     )
 })
 

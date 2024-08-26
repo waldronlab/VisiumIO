@@ -15,7 +15,7 @@ TENxVisiumHD(
   sample_id = "sample01",
   processing = c("filtered", "raw"),
   images = c("lowres", "hires", "detected", "aligned_fiducials"),
-  bin_size = c("2", "8", "16"),
+  bin_size = c("002", "008", "016"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions\\\\.parquet",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
@@ -34,8 +34,8 @@ folder available e.g., "filtered_feature_barcode_matrix" in the
 can be one or multiple of "lowres", "hires", "detected", "aligned".}
 
 \item{bin_size}{A character vector of bin sizes to use for the spatial
-coordinates. The default is all "2", "8", and "16". These correspond to
-folders named "square_002um", "square_008um", and "square_016um" in the
+coordinates. The default is all "002", "008", and "016". These correspond
+to folders named "square_002um", "square_008um", and "square_016um" in the
 \code{binned_outputs} directory.}
 
 \item{jsonFile}{\code{character(1)} A single string specifying the name of the

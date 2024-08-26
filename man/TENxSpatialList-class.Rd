@@ -14,6 +14,7 @@ TENxSpatialList(
   images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
+  resolution = character(0L),
   ...
 )
 
@@ -75,6 +76,6 @@ spatial_dir <- system.file(
     package = "SpatialExperiment"
 )
 
-TENxSpatialList(resources = spatial_dir)
+TENxSpatialList(resources = spatial_dir, images = "lowres")
 
 }
