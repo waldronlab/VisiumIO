@@ -21,9 +21,7 @@
 
 .getSpatialPath <- function(path, bin_size) {
     outputs <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-    squaref <- paste0(
-        "square_0", ifelse(nchar(bin_size) - 1, "", "0"), bin_size, "um"
-    )
+    squaref <- paste0("square_", bin_size, "um")
     if (!identical(basename(outputs), "binned_outputs"))
         stop("The 'binned_outputs' directory was not found")
     file.path(outputs, squaref, "spatial")
