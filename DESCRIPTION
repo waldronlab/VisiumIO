@@ -1,6 +1,6 @@
 Package: VisiumIO
 Title: Import Visium data from the 10X Space Ranger pipeline
-Version: 1.1.2
+Version: 1.1.3
 Authors@R:
     person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3242-0582"))
@@ -30,7 +30,7 @@ biocViews: Software, Infrastructure, DataImport, SingleCell, Spatial
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 BugReports: https://github.com/waldronlab/VisiumIO/issues
 URL: https://github.com/waldronlab/VisiumIO
 Collate:
@@ -40,4 +40,4 @@ Collate:
     'TENxVisium-class.R'
     'TENxVisiumList-class.R'
     'TENxVisiumHD-class.R'
-Date: 2024-08-22
+Date: 2024-08-28
