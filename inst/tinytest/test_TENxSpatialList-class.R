@@ -15,7 +15,7 @@ expect_true(
 # When none are specified all images are listed
 expect_identical(
     txsl@images,
-    c("lowres", "hires", "detected", "aligned")
+    c("lowres", "hires", "detected", "aligned", "aligned_fiducials")
 )
 expect_identical(
     txsl@scaleJSON,

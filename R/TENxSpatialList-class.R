@@ -56,6 +56,12 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #'
 #' @inheritParams TENxVisium
 #'
+#' @param resolution `character()` A vector specifying the resolution of the
+#'  images to import. The default is `character(0L)`, which will import all
+#'  available resolutions. If missing, the function will obtain a resolution
+#'  value from the directory name `square_000um` where `000` is the resolution
+#'  value.
+#'
 #' @importFrom BiocIO decompress
 #'
 #' @returns A `SpatialExperiment` object
@@ -80,18 +86,24 @@ TENxSpatialList <- function(
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
-    spatf <- TENxFileList(resources, ...)
-    if (spatf@compressed)
-        spatf <- decompress(con = spatf)
-    tissuePos <- grep(tissuePattern, names(spatf), value = TRUE)
+    if (!is(resources, "TENxFileList"))
+        resources <- TENxFileList(resources, ...)
+    if (resources@compressed)
+        resources <- decompress(con = resources)
+    tissuePos <- grep(tissuePattern, names(resources), value = TRUE)
     if (!length(tissuePos))
         stop("No tissue positions file found with pattern: ", tissuePattern)
 
-    if (missing(resolution) && grepl("square_\\d{3}", resources))
-        resolution <- gsub(".*?square_(\\d{3}).*", "\\1", resources)
+    if (missing(resolution) && any(grepl("square_\\d{3}", path(resources)))) {
+        resolution <- unique(
+            gsub(".*?square_(\\d{3}).*", "\\1", path(resources))
+        )
+        if (!identical(length(resolution), 1L))
+            stop("Multiple 'resolution' values found in the directory")
+    }
 
     .TENxSpatialList(
-        spatf, images = images, scaleJSON = jsonFile,
+        resources, images = images, scaleJSON = jsonFile,
         tissuePos = tissuePos, sampleId = sample_id,
         resolution = resolution
     )

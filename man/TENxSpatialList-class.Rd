@@ -35,6 +35,12 @@ JSON file containing the scale factors.}
 \item{tissuePattern}{\code{character(1)} A single string specifying the pattern
 to match the tissue positions file.}
 
+\item{resolution}{\code{character()} A vector specifying the resolution of the
+images to import. The default is \code{character(0L)}, which will import all
+available resolutions. If missing, the function will obtain a resolution
+value from the directory name \code{square_000um} where \code{000} is the resolution
+value.}
+
 \item{...}{Parameters to pass to the format-specific method.}
 
 \item{con}{The connection from which data is loaded or to which data is

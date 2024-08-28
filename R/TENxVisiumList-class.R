@@ -26,6 +26,8 @@
 
 #' @rdname TENxVisiumList-class
 #'
+#' @inheritParams TENxVisium
+#'
 #' @param sampleFolders `character()` A vector of strings specifying the
 #'   directories containing the output of the `spaceranger count` command.
 #'

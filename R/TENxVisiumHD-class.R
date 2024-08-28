@@ -12,7 +12,7 @@
 #'  command outputs a folder containing the "raw" or "filtered"
 #'  `()_feature_bc_matrix`.
 #'
-#' @inheritParams TENxVisiumList
+#' @inheritParams TENxVisiumList-class
 #'
 #' @return A [SpatialExperiment] object
 #'
@@ -76,6 +76,7 @@
 
 #' @rdname TENxVisiumHD-class
 #'
+#' @inheritParams TENxVisium
 #' @inheritParams TENxVisiumList
 #'
 #' @param bin_size A character vector of bin sizes to use for the spatial

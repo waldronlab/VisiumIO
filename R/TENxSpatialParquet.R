@@ -62,13 +62,14 @@ TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
 #'
 #' @inheritParams BiocIO::import
 #'
+#' @importFrom BiocBaseUtils checkInstalled
+#'
 #' @return import-method: A `DataFrame` object containing the data from the
 #'   Parquet file
 #'
 #' @exportMethod import
 setMethod("import", "TENxSpatialParquet", function(con, format, text, ...) {
-    if (!requireNamespace("arrow", quietly = TRUE))
-        stop("The 'arrow' package is required to import Parquet files")
+    checkInstalled("arrow")
     arrow::read_parquet(
         path(con)
     )

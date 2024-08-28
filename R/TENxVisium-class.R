@@ -203,7 +203,7 @@ S4Vectors::setValidity2("TENxVisium", .validTENxVisium)
 #' @inheritParams BiocIO::import
 #'
 #' @importFrom BiocIO import
-#' @importFrom BiocBaseUtils checkInstalled
+#' @importFrom methods as
 #' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom SummarizedExperiment assays rowData colData
 #'
@@ -226,12 +226,10 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
     if (!length(matches))
         stop("No matching barcodes found between spatial and expression data.")
 
-    if (is_tbl_df) {
-        checkInstalled("dplyr")
-        spd <- dplyr::filter(spd, barcode %in% matches)
-    } else {
+    if (is_tbl_df)
+        spd <- spd[spd[["barcode"]] %in% matches, ]
+    else
         spd <- spd[matches, ]
-    }
 
     sce <- sce[, matches]
 

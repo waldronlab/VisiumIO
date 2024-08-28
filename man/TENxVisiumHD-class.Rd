@@ -25,6 +25,19 @@ TENxVisiumHD(
 \S4method{import}{TENxVisiumHD,ANY,ANY}(con, format, text, ...)
 }
 \arguments{
+\item{resources}{A \link{TENxFileList} object or a file path to the tarball
+containing the matrix / assay data resources.}
+
+\item{spatialResource}{A \link{TENxSpatialList} object or a file path to the
+tarball containing the spatial data.}
+
+\item{spacerangerOut}{\code{character(1)} A single string specifying the path to
+the sample directory of \verb{spaceranger count}. The directory must contain the
+\verb{(processing)_feature_bc_matrix} and \code{spatial} sub directories in addition
+to the \code{outs} folder.}
+
+\item{sample_id}{\code{character(1)} A single string specifying the sample ID.}
+
 \item{processing}{\code{character(1)} A single string indicating the processing
 folder available e.g., "filtered_feature_barcode_matrix" in the
 \code{spacerangerOut} folder. It can be either "filtered" or "raw" (default
