@@ -1,3 +1,5 @@
+setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
+
 #' @docType class
 #'
 #' @title A class to represent and import a single Visium Sample
@@ -30,7 +32,7 @@
 .TENxVisium <- setClass(
     Class = "TENxVisium",
     slots = c(
-        resources = "TENxFileList",
+        resources = "TENxFileList_OR_TENxH5",
         spatialList = "TENxSpatialList",
         coordNames = "character",
         sampleId = "character"
@@ -43,32 +45,56 @@
     sQuote(.FEATURE_BC_MATRIX_FILES), collapse = ", "
 )
 
-#' @importFrom TENxIO TENxFileList
-.find_convert_resources <- function(path, processing, ...) {
-    if (!is(path, "TENxFileList")) {
-        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-        fdirname <- paste0(processing, "_feature_bc_matrix")
-        featdir <- file.path(odir, fdirname)
-        if (
-            identical(length(odir), 1L) && endsWith(odir, "outs") &&
-            identical(length(featdir), 1L) && dir.exists(featdir)
+.find_file_or_dir <- function(reldir, processing, format) {
+    ext <- if (identical(format, "h5")) ".h5"
+    fdirname <- paste0(processing, "_feature_bc_matrix", ext)
+    fileordir <- file.path(reldir, fdirname)
+    if (
+        identical(length(reldir), 1L) &&  identical(length(fileordir), 1L) &&
+        (dir.exists(fileordir) || file.exists(fileordir))
+    )
+        path <- fileordir
+    else
+        stop(
+            "The '", fdirname, "' directory was not found.",
+            "\n  Verify 'spacerangerOut' and 'processing' inputs.",
+            call. = FALSE
         )
-            path <- featdir
-        else
-            stop(
-                "The 'outs' or '", fdirname, "' directory was not found.",
-                "\n  Verify 'spacerangerOut' and 'processing' inputs.",
-                call. = FALSE
-            )
+    path
+}
+
+.filter_mtx_filelist <- function(path) {
+    if (!all(.FEATURE_BC_MATRIX_FILES %in% names(path)))
+        stop(
+            "'TENxFileList' does not contain the expected files:\n  ",
+            .FEATURE_BC_MATRIX_FILES_PRINT
+        )
+    path[.FEATURE_BC_MATRIX_FILES]
+}
+
+.filter_h5_files <- function(path, processing, format) {
+    fname <- paste0(processing, "_feature_bc_matrix", ".", format)
+    if (!fname %in% names(path))
+        stop("The '", fname, "' file was not found.")
+    path(path[fname])
+}
+
+#' @importFrom TENxIO TENxFileList
+.find_convert_resources <- function(path, processing, format, ...) {
+    odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+    stopifnot("The 'outs' directory was not found." = endsWith(odir, "outs"))
+    if (!is(path, "TENxFileList")) {
+        path <- .find_file_or_dir(odir, processing, format)
     } else {
-        if (!all(.FEATURE_BC_MATRIX_FILES %in% names(path)))
-            stop(
-                "'TENxFileList' does not contain the expected files:\n  ",
-                .FEATURE_BC_MATRIX_FILES_PRINT
-            )
-        path <- path[.FEATURE_BC_MATRIX_FILES]
+        if (identical(format, "mtx"))
+            path <- .filter_mtx_filelist(path)
+        else if (identical(format, "h5"))
+            path <- .filter_h5_files(path, processing, format)
     }
-    TENxFileList(path, ...)
+    if (file.info(path)[["isdir"]])
+        TENxFileList(path, ...)[.FEATURE_BC_MATRIX_FILES]
+    else if (identical(tools::file_ext(path), "h5"))
+        TENxH5(path, ...)
 }
 
 .find_convert_spatial <- function(path, ...) {
@@ -128,11 +154,19 @@
 #'     package = "SpatialExperiment"
 #' )
 #'
+#' ## using spacerangerOut folder
 #' tv <- TENxVisium(
 #'     spacerangerOut = sample_dir, processing = "raw", images = "lowres"
 #' )
 #'
 #' import(tv)
+#'
+#' ## with TENxFileList
+#' tvfl <- TENxVisium(
+#'     spacerangerOut = TENxFileList(sample_dir)
+#' )
+#'
+#' import(tvfl)
 #'
 #' @export
 TENxVisium <- function(
@@ -141,6 +175,7 @@ TENxVisium <- function(
     spacerangerOut,
     sample_id = "sample01",
     processing = c("filtered", "raw"),
+    format = c("mtx", "h5"),
     images = c("lowres", "hires", "detected", "aligned"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*\\.csv",
@@ -149,12 +184,14 @@ TENxVisium <- function(
 ) {
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
+    format <- match.arg(format)
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
             stopifnot(
                 dir.exists(spacerangerOut)
             )
-        resources <- .find_convert_resources(spacerangerOut, processing, ...)
+        resources <-
+            .find_convert_resources(spacerangerOut, processing, format, ...)
         spatialResource <- .find_convert_spatial(
             path = spacerangerOut, sample_id = sample_id, images = images,
             jsonFile = jsonFile, tissuePattern = tissuePattern
@@ -186,14 +223,14 @@ TENxVisium <- function(
 }
 
 .validTENxVisium <- function(object) {
-    isFL <- is(object@resources, "TENxFileList")
+    isFL <- is(object@resources, "TENxFileList_OR_TENxH5")
     isSL <- is(object@spatialList, "TENxSpatialList")
     if (isSL && isFL)
         TRUE
     else if (!isFL)
-        "'TENxFileList' component is not of TENxFileList class"
+        "'resources' component is not of TENxFileList or TENxH5 class"
     else
-        "'TENxSpatialList' component is not of TENxSpatialList class"
+        "'spatialList' component is not of TENxSpatialList class"
 }
 
 S4Vectors::setValidity2("TENxVisium", .validTENxVisium)

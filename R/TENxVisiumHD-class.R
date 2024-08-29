@@ -21,17 +21,25 @@
 
 .getSpatialPath <- function(path, bin_size) {
     outputs <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+    stopifnot(
+        "The 'binned_outputs' directory was not found." =
+            endsWith(outputs, "binned_outputs")
+    )
     squaref <- paste0("square_", bin_size, "um")
-    if (!identical(basename(outputs), "binned_outputs"))
-        stop("The 'binned_outputs' directory was not found")
-    file.path(outputs, squaref, "spatial")
+    spatf <- file.path(outputs, squaref, "spatial")
+    stopifnot(
+        "The 'spatial' directory was not found." = all(dir.exists(spatf))
+    )
+    spatf
 }
 
-.find_convert_resources_hd <- function(path, processing, bin_size, ...) {
+.find_convert_resources_hd <-
+    function(path, processing, format, bin_size, ...)
+{
     if (!is(path, "TENxFileList")) {
         squaref <- .getSpatialPath(path, bin_size) |> dirname()
-        stopifnot(
-            all(startsWith(basename(squaref), "square_"))
+        path <- vapply(
+            squaref, .find_file_or_dir, character(1L), processing, format
         )
         fdirname <- paste0(processing, "_feature_bc_matrix")
         if (
@@ -52,8 +60,13 @@
             )
         path <- path[.FEATURE_BC_MATRIX_FILES]
     }
+    FileFUN <- if (identical(unique(tools::file_ext(path)), "h5"))
+            function(x) {TENxH5(x, ranges = NA_character_) }
+        else if (identical(unique(tools::file_ext(path)), ""))
+            TENxFileList
+
     mapply(
-        TENxFileList,
+        FileFUN,
         path,
         MoreArgs = list(...),
         SIMPLIFY = FALSE
@@ -90,6 +103,7 @@ TENxVisiumHD <- function(
     spacerangerOut,
     sample_id = "sample01",
     processing = c("filtered", "raw"),
+    format = c("mtx", "h5"),
     images = c("lowres", "hires", "detected", "aligned_fiducials"),
     bin_size = c("008", "016", "002"),
     jsonFile = .SCALE_JSON_FILE,
@@ -107,7 +121,7 @@ TENxVisiumHD <- function(
                 dir.exists(spacerangerOut)
             )
         resources <- .find_convert_resources_hd(
-            spacerangerOut, processing, bin_size, ...
+            spacerangerOut, processing, format, bin_size, ...
         )
         spatialResource <- .find_convert_spatial_hd(
             path = spacerangerOut, bin_size = bin_size, sample_id = sample_id,
