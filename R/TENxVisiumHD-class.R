@@ -61,7 +61,7 @@
         path <- path[.FEATURE_BC_MATRIX_FILES]
     }
     FileFUN <- if (identical(unique(tools::file_ext(path)), "h5"))
-            function(x) {TENxH5(x, ranges = NA_character_) }
+            function(x) { TENxH5(x, ranges = NA_character_) }
         else if (identical(unique(tools::file_ext(path)), ""))
             TENxFileList
 
