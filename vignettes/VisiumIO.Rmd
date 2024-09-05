@@ -40,7 +40,10 @@ methods to handle spatially resolved transcriptomics data.
 
 | **Extension**       | **Class**     | **Imported as**      |
 |---------------------|---------------|----------------------|
-| spatial.tar.gz      | TENxSpatialList | inter. DataFrame list |
+| spatial.tar.gz      | TENxSpatialList | DataFrame list *   |
+| .parquet            | TENxSpatialParquet | tibble *        |
+
+__Note__. (*) Intermediate format 
 
 # Installation
 
@@ -74,13 +77,13 @@ TENxVisium(
 )
 ```
 
-The `resource` argument is the path to the 10X Visium file. The `spatialResource`
-argument is the path to the 10X Visium spatial file. It usually ends in
-`spatial.tar.gz`.
+The `resource` argument is the path to the 10X Visium file. The
+`spatialResource` argument is the path to the 10X Visium spatial file. It
+usually ends in `spatial.tar.gz`.
 
 ## Example from SpatialExperiment
 
-Note that we use the `image = "lowres"` and `processing = "raw"` arguments based
+Note that we use the `images = "lowres"` and `processing = "raw"` arguments based
 on the name of the `tissue_*_image.png` file and `*_feature_bc_matrix` folder in
 the `spaceranger` output. The directory structure for a **single** sample is
 shown below:
@@ -177,7 +180,7 @@ vlist <- TENxVisiumList(
     sampleFolders = sample_dirs,
     sample_ids = basename(sample_dirs),
     processing = "raw",
-    image = "lowres"
+    images = "lowres"
 )
 vlist
 ```
@@ -191,6 +194,61 @@ both samples (`section1` and `section2`).
 
 ```{r}
 import(vlist)
+```
+
+### Visium HD folder structure
+
+The directory structure for a single bin size is shown below.
+
+```
+    Visium_HD
+    └── binned_outputs
+        └─── square_002um
+        │   └── filtered_feature_bc_matrix
+        │   │   └── barcodes.tsv.gz
+        │   │   └── features.tsv.gz
+        │   │   └── matrix.mtx.gz
+        │   └── filtered_feature_bc_matrix.h5
+        │   └── raw_feature_bc_matrix/
+        │   └── raw_feature_bc_matrix.h5
+        │   └── spatial
+        │       └── [ ... ]
+        │       └── tissue_positions.parquet
+        └── square_*
+```
+
+### Import Visium HD into SpatialExperiment
+
+```{r, eval=FALSE}
+TENxVisiumHD(
+    spacerangerOut = "./Visium_HD/",
+    sample_id = "sample01",
+    processing = c("filtered", "raw"),
+    images = c("lowres", "hires", "detected", "aligned_fiducials"),
+    bin_size = c("002", "008", "016"),
+    jsonFile = .SCALE_JSON_FILE,
+    tissuePattern = "tissue_positions\\.parquet",
+    spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+    ...
+)
+```
+
+### In-package example
+
+```{r}
+visfold <- system.file(
+    package = "VisiumIO", "extdata", "VisiumHD", mustWork = TRUE
+)
+TENxVisiumHD(
+    spacerangerOut = visfold, images = "lowres", bin_size = "002"
+) |> import()
+```
+
+```{r, eval = FALSE}
+TENxVisiumHD(
+    spacerangerOut = visfold, images = "lowres", bin_size = "002",
+    format = "h5"
+) |> import()
 ```
 
 # Session Info

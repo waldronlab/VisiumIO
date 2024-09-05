@@ -63,7 +63,7 @@ It usually ends in `spatial.tar.gz`.
 
 ## Example from SpatialExperiment
 
-Note that we use the `image = "lowres"` and `processing = "raw"`
+Note that we use the `images = "lowres"` and `processing = "raw"`
 arguments based on the name of the `tissue_*_image.png` file and
 `*_feature_bc_matrix` folder in the `spaceranger` output. The directory
 structure for a **single** sample is shown below:
@@ -186,7 +186,7 @@ vlist <- TENxVisiumList(
     sampleFolders = sample_dirs,
     sample_ids = basename(sample_dirs),
     processing = "raw",
-    image = "lowres"
+    images = "lowres"
 )
 #> Warning in TENxVisiumList(sampleFolders = sample_dirs, sample_ids =
 #> basename(sample_dirs), : partial argument match of 'image' to 'images'
