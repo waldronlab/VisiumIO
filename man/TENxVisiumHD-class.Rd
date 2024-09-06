@@ -46,10 +46,9 @@ folder available e.g., "filtered_feature_barcode_matrix" in the
 \item{images}{\code{character()} A vector specifying the images to be imported;
 can be one or multiple of "lowres", "hires", "detected", "aligned".}
 
-\item{bin_size}{A character vector of bin sizes to use for the spatial
-coordinates. The default is all "002", "008", and "016". These correspond
-to folders named "square_002um", "square_008um", and "square_016um" in the
-\code{binned_outputs} directory.}
+\item{bin_size}{\code{character(1)} The bin size of the images to import. The
+default is \code{008}. It corresponds to the directory name \code{square_000um} where
+\code{000} is the bin value.}
 
 \item{jsonFile}{\code{character(1)} A single string specifying the name of the
 JSON file containing the scale factors.}

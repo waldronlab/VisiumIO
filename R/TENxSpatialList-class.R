@@ -12,6 +12,10 @@
 #'
 #' @inheritParams TENxVisium
 #'
+#' @slot binSize The bin size of the images to import. The default slot value is
+#'   `character()`. It typically corresponds to the directory name
+#'   `square_000um` where `000` is the bin value.
+#'
 #' @exportClass TENxSpatialList
 .TENxSpatialList <- setClass(
     "TENxSpatialList",
@@ -56,7 +60,7 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #'
 #' @inheritParams TENxVisium
 #'
-#' @param binSize `character(1)` The bin size of the images to import. The
+#' @param bin_size `character(1)` The bin size of the images to import. The
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.
 #'

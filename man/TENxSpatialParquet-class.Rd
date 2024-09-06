@@ -62,7 +62,7 @@ Parquet}
 
 \examples{
 sample_dir <- system.file(
-    file.path("extdata", "VisiumHD"),
+    file.path("extdata", "binned_outputs", "square_002um", "spatial"),
     package = "VisiumIO"
 )
 spatial_dir <- Filter(

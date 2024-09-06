@@ -79,10 +79,9 @@
 #' @inheritParams TENxVisium
 #' @inheritParams TENxVisiumList
 #'
-#' @param bin_size A character vector of bin sizes to use for the spatial
-#'  coordinates. The default is all "002", "008", and "016". These correspond
-#'  to folders named "square_002um", "square_008um", and "square_016um" in the
-#'  `binned_outputs` directory.
+#' @param bin_size `character(1)` The bin size of the images to import. The
+#'   default is `008`. It corresponds to the directory name `square_000um` where
+#'   `000` is the bin value.
 #'
 #' @export
 TENxVisiumHD <- function(
