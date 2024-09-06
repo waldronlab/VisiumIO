@@ -21,7 +21,7 @@
         scaleJSON = "character",
         tissuePos = "character",
         sampleId = "character",
-        resolution = "character"
+        binSize = "character"
     )
 )
 
@@ -56,11 +56,9 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #'
 #' @inheritParams TENxVisium
 #'
-#' @param resolution `character()` A vector specifying the resolution of the
-#'  images to import. The default is `character(0L)`, which will import all
-#'  available resolutions. If missing, the function will obtain a resolution
-#'  value from the directory name `square_000um` where `000` is the resolution
-#'  value.
+#' @param binSize `character(1)` The bin size of the images to import. The
+#'   default is `008`. It corresponds to the directory name `square_000um` where
+#'   `000` is the bin value.
 #'
 #' @importFrom BiocIO decompress
 #'
@@ -82,7 +80,7 @@ TENxSpatialList <- function(
     images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
-    resolution = character(0L),
+    bin_size = character(0L),
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -94,18 +92,18 @@ TENxSpatialList <- function(
     if (!length(tissuePos))
         stop("No tissue positions file found with pattern: ", tissuePattern)
 
-    if (missing(resolution) && any(grepl("square_\\d{3}", path(resources)))) {
-        resolution <- unique(
+    if (missing(bin_size) && any(grepl("square_\\d{3}", path(resources)))) {
+        bin_size <- unique(
             gsub(".*?square_(\\d{3}).*", "\\1", path(resources))
         )
-        if (!identical(length(resolution), 1L))
-            stop("Multiple 'resolution' values found in the directory")
+        if (!identical(length(bin_size), 1L))
+            stop("Multiple 'bin_size' values found in the directory")
     }
 
     .TENxSpatialList(
         resources, images = images, scaleJSON = jsonFile,
         tissuePos = tissuePos, sampleId = sample_id,
-        resolution = resolution
+        binSize = bin_size
     )
 }
 
@@ -131,8 +129,8 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
         prefix = "TENxSpatial", suffix = NULL
     )
     ffcolData <- import(fff)
-    if (length(con@resolution))
-        ffcolData[["resolution"]] <- con@resolution
+    if (length(con@binSize))
+        ffcolData[["bin_size"]] <- con@binSize
     list(
         imgData = DataFrame(
             do.call(rbind, DFs)

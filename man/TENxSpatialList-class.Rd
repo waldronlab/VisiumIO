@@ -14,7 +14,7 @@ TENxSpatialList(
   images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
-  resolution = character(0L),
+  bin_size = character(0L),
   ...
 )
 
@@ -35,12 +35,6 @@ JSON file containing the scale factors.}
 \item{tissuePattern}{\code{character(1)} A single string specifying the pattern
 to match the tissue positions file.}
 
-\item{resolution}{\code{character()} A vector specifying the resolution of the
-images to import. The default is \code{character(0L)}, which will import all
-available resolutions. If missing, the function will obtain a resolution
-value from the directory name \code{square_000um} where \code{000} is the resolution
-value.}
-
 \item{...}{Parameters to pass to the format-specific method.}
 
 \item{con}{The connection from which data is loaded or to which data is
@@ -56,6 +50,10 @@ unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
 
 \item{text}{If \code{con} is missing, this can be a character vector directly
 providing the string data to import.}
+
+\item{binSize}{\code{character(1)} The bin size of the images to import. The
+default is \code{008}. It corresponds to the directory name \code{square_000um} where
+\code{000} is the bin value.}
 }
 \value{
 A \code{SpatialExperiment} object
