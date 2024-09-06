@@ -92,7 +92,7 @@ TENxVisiumHD <- function(
     sample_id = "sample01",
     processing = c("filtered", "raw"),
     images = c("lowres", "hires", "detected", "aligned_fiducials"),
-    bin_size = c("002", "008", "016"),
+    bin_size = c("008", "016", "002"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions\\.parquet",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
@@ -100,7 +100,7 @@ TENxVisiumHD <- function(
 ) {
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
-    bin_size <- match.arg(bin_size, several.ok = TRUE)
+    bin_size <- match.arg(bin_size)
 
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
