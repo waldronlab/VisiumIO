@@ -76,6 +76,17 @@ of this class.
 \section{Slots}{
 
 \describe{
+\item{\code{images}}{\code{character()} The image names to use with \code{grep} and include in
+the list of files.}
+
+\item{\code{scaleJSON}}{\code{character(1)} The file name of the scale factors JSON file,
+defaults to 'scalefactors_json.json'.}
+
+\item{\code{tissuePos}}{\code{character(1)} The file name of the tissue positions file;
+typically a \code{.parquet} or \code{.csv} file.}
+
+\item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
+
 \item{\code{binSize}}{The bin size of the images to import. The default slot value is
 \code{character()}. It typically corresponds to the directory name
 \code{square_000um} where \code{000} is the bin value.}

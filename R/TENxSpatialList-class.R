@@ -12,6 +12,17 @@
 #'
 #' @inheritParams TENxVisium
 #'
+#' @slot images `character()` The image names to use with `grep` and include in
+#'   the list of files.
+#'
+#' @slot scaleJSON `character(1)` The file name of the scale factors JSON file,
+#'   defaults to 'scalefactors_json.json'.
+#'
+#' @slot tissuePos `character(1)` The file name of the tissue positions file;
+#'   typically a `.parquet` or `.csv` file.
+#'
+#' @slot sampleId `character(1)` A scalar specifying the sample identifier.
+#'
 #' @slot binSize The bin size of the images to import. The default slot value is
 #'   `character()`. It typically corresponds to the directory name
 #'   `square_000um` where `000` is the bin value.
