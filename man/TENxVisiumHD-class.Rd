@@ -14,6 +14,7 @@ TENxVisiumHD(
   spacerangerOut,
   sample_id = "sample01",
   processing = c("filtered", "raw"),
+  format = c("mtx", "h5"),
   images = c("lowres", "hires", "detected", "aligned_fiducials"),
   bin_size = c("008", "016", "002"),
   jsonFile = .SCALE_JSON_FILE,
@@ -43,6 +44,10 @@ folder available e.g., "filtered_feature_barcode_matrix" in the
 \code{spacerangerOut} folder. It can be either "filtered" or "raw" (default
 "filtered"). Only used when \code{spacerangerOut} is specified.}
 
+\item{format}{The format of the output. If missing and \code{con} is a
+file name, the format is derived from the file extension. This argument is
+unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
+
 \item{images}{\code{character()} A vector specifying the images to be imported;
 can be one or multiple of "lowres", "hires", "detected", "aligned".}
 
@@ -68,10 +73,6 @@ a corresponding file connection is created and then closed after exporting
 the object. If it is a \linkS4class{BiocFile} derivative, the data is loaded from
 or saved to the underlying resource. If missing, the function will return
 the output as a character vector, rather than writing to a connection.}
-
-\item{format}{The format of the output. If missing and \code{con} is a
-file name, the format is derived from the file extension. This argument is
-unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
 
 \item{text}{If \code{con} is missing, this can be a character vector directly
 providing the string data to import.}
