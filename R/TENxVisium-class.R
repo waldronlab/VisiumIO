@@ -81,9 +81,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
 #' @importFrom TENxIO TENxFileList
 .find_convert_resources <- function(path, processing, format, ...) {
+    if (!is(path, "TENxFileList")) {
         odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
         stopifnot("The 'outs' directory was not found." = endsWith(odir, "outs"))
-    if (!is(path, "TENxFileList")) {
         path <- .find_file_or_dir(odir, processing, format)
     } else {
         if (identical(format, "mtx"))
