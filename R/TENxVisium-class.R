@@ -81,8 +81,8 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
 #' @importFrom TENxIO TENxFileList
 .find_convert_resources <- function(path, processing, format, ...) {
-    odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-    stopifnot("The 'outs' directory was not found." = endsWith(odir, "outs"))
+        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+        stopifnot("The 'outs' directory was not found." = endsWith(odir, "outs"))
     if (!is(path, "TENxFileList")) {
         path <- .find_file_or_dir(odir, processing, format)
     } else {
@@ -271,8 +271,10 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
     sce <- sce[, matches]
 
     SpatialExperiment::SpatialExperiment(
-        assays = assays(sce),
-        rowData = S4Vectors::DataFrame(Symbol = rowData(sce)[["Symbol"]]),
+        assays = list(counts = assay(sce)),
+        rowData = rowData(sce),
+        mainExpName = mainExpName(sce),
+        altExps = altExps(sce),
         sample_id = con@sampleId,
         colData = as(spd, "DataFrame"),
         spatialCoordsNames = con@coordNames,
