@@ -102,7 +102,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     if (file.info(path)[["isdir"]])
         TENxFileList(path, ...)[.FEATURE_BC_MATRIX_FILES]
     else if (identical(tools::file_ext(path), "h5"))
-        TENxH5(path, ...)
+        TENxH5(path, ranges = NA_character_, ...)
 }
 
 .find_convert_spatial <- function(path, ...) {
