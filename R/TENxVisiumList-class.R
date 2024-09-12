@@ -43,7 +43,7 @@
 #' sample_dirs <- list.dirs(
 #'     system.file(
 #'         file.path("extdata", "10xVisium"),
-#'         package = "SpatialExperiment"
+#'         package = "VisiumIO"
 #'     ),
 #'     recursive = FALSE, full.names = TRUE
 #' )
@@ -52,7 +52,8 @@
 #'     sampleFolders = sample_dirs,
 #'     sample_ids = c("sample01", "sample02"),
 #'     processing = "raw",
-#'     images = "lowres"
+#'     images = "lowres",
+#'     format = "mtx"
 #' )
 #'
 #' import(tvl)
@@ -63,6 +64,7 @@ TENxVisiumList <- function(
     sample_ids,
     processing = c("filtered", "raw"),
     images = c("lowres", "hires", "detected", "aligned"),
+    format = c("mtx", "h5"),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*\\.csv",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
@@ -74,7 +76,9 @@ TENxVisiumList <- function(
     resources <- lapply(
         sampleFolders,
         .find_convert_resources,
-        processing = processing, ...
+        processing = processing,
+        format = format,
+        ...
     )
 
     if (missing(sample_ids))

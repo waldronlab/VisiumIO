@@ -13,6 +13,7 @@ TENxVisiumList(
   sample_ids,
   processing = c("filtered", "raw"),
   images = c("lowres", "hires", "detected", "aligned"),
+  format = c("mtx", "h5"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*\\\\.csv",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
@@ -38,6 +39,10 @@ folder available e.g., "filtered_feature_barcode_matrix" in the
 \item{images}{\code{character()} A vector specifying the images to be imported;
 can be one or multiple of "lowres", "hires", "detected", "aligned".}
 
+\item{format}{The format of the output. If missing and \code{con} is a
+file name, the format is derived from the file extension. This argument is
+unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
+
 \item{jsonFile}{\code{character(1)} A single string specifying the name of the
 JSON file containing the scale factors.}
 
@@ -56,10 +61,6 @@ a corresponding file connection is created and then closed after exporting
 the object. If it is a \linkS4class{BiocFile} derivative, the data is loaded from
 or saved to the underlying resource. If missing, the function will return
 the output as a character vector, rather than writing to a connection.}
-
-\item{format}{The format of the output. If missing and \code{con} is a
-file name, the format is derived from the file extension. This argument is
-unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
 
 \item{text}{If \code{con} is missing, this can be a character vector directly
 providing the string data to import.}
@@ -87,7 +88,7 @@ command outputs a folder containing the "raw" or "filtered"
 sample_dirs <- list.dirs(
     system.file(
         file.path("extdata", "10xVisium"),
-        package = "SpatialExperiment"
+        package = "VisiumIO"
     ),
     recursive = FALSE, full.names = TRUE
 )
@@ -96,7 +97,8 @@ tvl <- TENxVisiumList(
     sampleFolders = sample_dirs,
     sample_ids = c("sample01", "sample02"),
     processing = "raw",
-    images = "lowres"
+    images = "lowres",
+    format = "mtx"
 )
 
 import(tvl)

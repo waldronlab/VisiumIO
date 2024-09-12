@@ -110,7 +110,7 @@ of the columns in the spatial data containing the spatial coordinates.}
 
 sample_dir <- system.file(
     file.path("extdata", "10xVisium", "section1"),
-    package = "SpatialExperiment"
+    package = "VisiumIO"
 )
 
 ## using spacerangerOut folder
@@ -122,7 +122,10 @@ import(tv)
 
 ## with TENxFileList
 tvfl <- TENxVisium(
-    spacerangerOut = TENxFileList(sample_dir)
+    spacerangerOut = TENxFileList(sample_dir),
+    format = "mtx",
+    processing = "raw",
+    images = "lowres"
 )
 
 import(tvfl)

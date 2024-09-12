@@ -82,9 +82,10 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
 .filter_h5_files <- function(path, processing, format) {
     fname <- paste0(processing, "_feature_bc_matrix", ".", format)
-    if (!fname %in% names(path))
+    ish5file <- endsWith(names(path), fname)
+    if (!any(ish5file))
         stop("The '", fname, "' file was not found.")
-    path(path[fname])
+    path(path[ish5file])
 }
 
 #' @importFrom TENxIO TENxFileList
@@ -96,13 +97,12 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     } else {
         if (identical(format, "mtx"))
             path <- .filter_mtx_filelist(path)
-        else if (identical(format, "h5"))
+        else if (identical(format, "h5")) {
             path <- .filter_h5_files(path, processing, format)
+            path <- TENxH5(path, ranges = NA_character_, ...)
+        }
     }
-    if (file.info(path)[["isdir"]])
-        TENxFileList(path, ...)[.FEATURE_BC_MATRIX_FILES]
-    else if (identical(tools::file_ext(path), "h5"))
-        TENxH5(path, ranges = NA_character_, ...)
+        path
 }
 
 .find_convert_spatial <- function(path, ...) {
@@ -159,7 +159,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' sample_dir <- system.file(
 #'     file.path("extdata", "10xVisium", "section1"),
-#'     package = "SpatialExperiment"
+#'     package = "VisiumIO"
 #' )
 #'
 #' ## using spacerangerOut folder
@@ -171,7 +171,10 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' ## with TENxFileList
 #' tvfl <- TENxVisium(
-#'     spacerangerOut = TENxFileList(sample_dir)
+#'     spacerangerOut = TENxFileList(sample_dir),
+#'     format = "mtx",
+#'     processing = "raw",
+#'     images = "lowres"
 #' )
 #'
 #' import(tvfl)
