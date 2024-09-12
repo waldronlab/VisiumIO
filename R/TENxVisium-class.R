@@ -46,8 +46,16 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 )
 
 .find_file_or_dir <- function(reldir, processing, format) {
-    ext <- if (identical(format, "h5")) ".h5"
-    fdirname <- paste0(processing, "_feature_bc_matrix", ext)
+    fdirname <- paste0(processing, "_feature_bc_matrix")
+    if (identical(format, "h5")) {
+        fnamepat <- paste0(processing, "_feature_bc_matrix\\.", format, "$")
+        fdirname <- list.files(reldir, pattern = fnamepat, recursive = FALSE)
+        if (!length(fdirname))
+            stop(
+                "File format not found: *",
+                processing, "_feature_bc_matrix.", format
+            )
+    }
     fileordir <- file.path(reldir, fdirname)
     if (
         identical(length(reldir), 1L) &&  identical(length(fileordir), 1L) &&
