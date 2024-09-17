@@ -82,7 +82,9 @@ A \link{SpatialExperiment} object
 }
 \description{
 This class contains a \code{SimpleList} of \link{TENxVisiumHD} objects
-each corresponding to one sample.
+each corresponding to one sample. The provided \code{spacerangerOut} folder
+should contain a \code{binned_outputs} folder where multiple \code{bin_size}
+subfolders are present, e.g., \code{square_002um}.
 }
 \details{
 Typically, the user will provide a path to a directory containing
@@ -95,3 +97,15 @@ command outputs a folder containing the "raw" or "filtered"
 \item \code{import(con = TENxVisiumHD, format = ANY, text = ANY)}: Import Visium HD data from multiple bin sizes
 
 }}
+\examples{
+
+vdir <- system.file(
+    "extdata", package = "VisiumIO", mustWork = TRUE
+)
+
+TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres")
+
+TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres") |>
+    import()
+
+}

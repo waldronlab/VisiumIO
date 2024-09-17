@@ -5,7 +5,9 @@
 #' @title A class to represent and import multiple Visium HD samples
 #'
 #' @description This class contains a `SimpleList` of [TENxVisiumHD] objects
-#'   each corresponding to one sample.
+#'   each corresponding to one sample. The provided `spacerangerOut` folder
+#'   should contain a `binned_outputs` folder where multiple `bin_size`
+#'   subfolders are present, e.g., `square_002um`.
 #'
 #' @details Typically, the user will provide a path to a directory containing
 #'  the output of the `spaceranger count` command. The `spaceranger count`
