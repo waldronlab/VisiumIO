@@ -20,10 +20,9 @@
 .TENxVisiumHD <- setClass(Class = "TENxVisiumHD", contains = "TENxVisiumList")
 
 .getSpatialPath <- function(path, bin_size) {
-    outputs <- list.dirs(path, recursive = FALSE, full.names = TRUE)
+    outputs <- file.path(path, "binned_outputs")
     stopifnot(
-        "The 'binned_outputs' directory was not found." =
-            endsWith(outputs, "binned_outputs")
+        "The 'binned_outputs' directory was not found." = dir.exists(outputs)
     )
     squaref <- paste0("square_", bin_size, "um")
     spatf <- file.path(outputs, squaref, "spatial")
@@ -95,6 +94,17 @@
 #' @param bin_size `character(1)` The bin size of the images to import. The
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.
+#'
+#' @examples
+#'
+#' vdir <- system.file(
+#'     "extdata", package = "VisiumIO", mustWork = TRUE
+#' )
+#'
+#' TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres")
+#'
+#' TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres") |>
+#'     import()
 #'
 #' @export
 TENxVisiumHD <- function(
