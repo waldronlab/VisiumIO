@@ -5,36 +5,60 @@ setwd(orig)
 
 R.utils::gunzip(
     "filtered_feature_bc_matrix/matrix.mtx.gz",
-    "filtered_feature_bc_matrix/test_matrix.mtx"
-)
-R.utils::gzip(
     "filtered_feature_bc_matrix/test_matrix.mtx",
-    "filtered_feature_bc_matrix/matrix.mtx.gz"
+    remove = FALSE
 )
-
+## reads as dgTMatrix
 mm <- readMM("filtered_feature_bc_matrix/test_matrix.mtx")
 writeMM(mm[1:10, 1:10], file = "~/gh/VisiumIO/inst/extdata/VisiumHD/binned_outputs/square_002um/filtered_feature_bc_matrix/matrix.mtx")
+## file.remove("filtered_feature_bc_matrix/test_matrix.mtx")
 
-setwd("~/gh/VisiumIO/inst/extdata/VisiumHD/binned_outputs/square_002um/")
-readLines("filtered_feature_bc_matrix/matrix.mtx")
-
-file.remove("filtered_feature_bc_matrix/matrix.mtx.gz")
-R.utils::gzip(
-    "filtered_feature_bc_matrix/matrix.mtx",
-    "filtered_feature_bc_matrix/matrix.mtx.gz"
-)
+setwd("~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/")
+readMM("filtered_feature_bc_matrix/matrix.mtx.gz")
 
 # features.tsv.gz ---------------------------------------------------------
 
-feats <- read.delim("square_002um/filtered_feature_bc_matrix/features.tsv.gz", header = FALSE, sep = "\t")[1:10, ]
-write.table(feats, file = "square_002um/filtered_feature_bc_matrix/features.tsv.gz", row.names = FALSE, sep = "\t", col.names = FALSE)
-# read.delim("square_002um/filtered_feature_bc_matrix/features.tsv.gz", header = FALSE, sep = "\t")
+setwd(orig)
+feats <- read.delim(
+    "filtered_feature_bc_matrix/features.tsv.gz",
+    header = FALSE, sep = "\t", nrows = 10
+)
+pkg_data <- "~/gh/VisiumIO/inst/extdata/binned_outputs"
+write.table(
+    feats, file =
+        file.path(
+            pkg_data, "square_002um/filtered_feature_bc_matrix/features.tsv.gz"
+        ),
+    row.names = FALSE, sep = "\t", col.names = FALSE
+)
+# read.delim(
+#     file.path(
+#           pkg_data, "square_002um/filtered_feature_bc_matrix/features.tsv.gz"
+#     ),
+#     header = FALSE, sep = "\t"
+# )
 
 # barcodes.tsv.gz ---------------------------------------------------------
 
-bcodes <- read.delim("square_002um/filtered_feature_bc_matrix/barcodes.tsv.gz", header = FALSE, sep = "\t")
-write.table(bcodes[1:10, , drop = FALSE], file = "square_002um/filtered_feature_bc_matrix/barcodes.tsv.gz", row.names = FALSE, sep = "\t", col.names = FALSE)
-# read.delim("square_002um/filtered_feature_bc_matrix/barcodes.tsv.gz", header = FALSE, sep = "\t")
+bcodes <- read.delim(
+    "filtered_feature_bc_matrix/barcodes.tsv.gz",
+    header = FALSE, sep = "\t", nrows = 10
+)
+write.table(
+    bcodes,
+    file = file.path(
+        pkg_data,
+        "square_002um/filtered_feature_bc_matrix/barcodes.tsv.gz"
+    ),
+    row.names = FALSE, sep = "\t", col.names = FALSE
+)
+# read.delim(
+#     file.path(
+#         pkg_data,
+#         "square_002um/filtered_feature_bc_matrix/barcodes.tsv.gz"
+#     ),
+#     header = FALSE, sep = "\t"
+# )
 
 # subset MTX format -------------------------------------------------------
 
@@ -81,4 +105,7 @@ ss <- TENxFileList(
 writepq <-
     park[park$barcode %in% colnames(ss),]
 
-arrow::write_parquet(writepq, sink = "inst/extdata/VisiumHD/binned_outputs/square_002um/spatial/tissue_positions.parquet")
+arrow::write_parquet(
+    writepq,
+    sink = "inst/extdata/VisiumHD/binned_outputs/square_002um/spatial/tissue_positions.parquet"
+)
