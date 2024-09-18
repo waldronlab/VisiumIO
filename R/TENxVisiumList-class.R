@@ -72,6 +72,7 @@ TENxVisiumList <- function(
 ) {
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
+    format <- match.arg(format)
 
     resources <- lapply(
         sampleFolders,
