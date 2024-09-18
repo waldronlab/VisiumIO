@@ -171,7 +171,7 @@ of sample identifiers, respectively.
 ```{r}
 sample_dirs <- list.dirs(
     system.file(
-        file.path("extdata", "10xVisium"), package = "SpatialExperiment"
+        file.path("extdata", "10xVisium"), package = "VisiumIO"
     ),
     recursive = FALSE, full.names = TRUE
 )
@@ -235,16 +235,20 @@ TENxVisiumHD(
 
 ### In-package example
 
+By default, the MatrixMarket format is read in (`format = "mtx"`).
+
 ```{r}
 visfold <- system.file(
-    package = "VisiumIO", "extdata", "VisiumHD", mustWork = TRUE
+    package = "VisiumIO", "extdata", mustWork = TRUE
 )
 TENxVisiumHD(
     spacerangerOut = visfold, images = "lowres", bin_size = "002"
 ) |> import()
 ```
 
-```{r, eval = FALSE}
+H5 files are supported via the `format = "h5"` argument input.
+
+```{r}
 TENxVisiumHD(
     spacerangerOut = visfold, images = "lowres", bin_size = "002",
     format = "h5"

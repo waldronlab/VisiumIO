@@ -130,6 +130,16 @@ tvfl <- TENxVisium(
 
 import(tvfl)
 
+## importing h5 format
+tvfl <- TENxVisium(
+    spacerangerOut = sample_dir,
+    format = "h5",
+    processing = "raw",
+    images = "lowres"
+)
+
+import(tvfl)
+
 }
 \seealso{
 \url{https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/output/overview}

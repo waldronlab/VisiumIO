@@ -103,9 +103,47 @@ vdir <- system.file(
     "extdata", package = "VisiumIO", mustWork = TRUE
 )
 
+## with spacerangerOut folder
 TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres")
 
 TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres") |>
+    import()
+
+## indicate h5 format
+TENxVisiumHD(
+    spacerangerOut = vdir, bin_size = "002",
+    images = "lowres", format = "h5"
+)
+
+TENxVisiumHD(
+    spacerangerOut = vdir, bin_size = "002",
+    images = "lowres", format = "h5"
+) |>
+    import()
+
+## use resources and spatialResource arguments as file paths
+TENxVisiumHD(
+    resources = file.path(
+        vdir, "binned_outputs", "square_002um",
+        "filtered_feature_bc_matrix.h5"
+    ),
+    spatialResource = "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/",
+    bin_size = "002", processing = "filtered",
+    images = "lowres", format = "h5"
+) |>
+    import()
+
+## provide the spatialResource argument as a TENxFileList
+TENxVisiumHD(
+    resources = file.path(
+        vdir, "binned_outputs", "square_002um",
+        "filtered_feature_bc_matrix.h5"
+    ),
+    spatialResource = TENxFileList(
+        "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/"
+    ),
+    bin_size = "002", images = "lowres", format = "h5"
+) |>
     import()
 
 }

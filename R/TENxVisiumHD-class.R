@@ -19,7 +19,7 @@
 #' @return A [SpatialExperiment] object
 #'
 #' @exportClass TENxVisiumHD
-.TENxVisiumHD <- setClass(Class = "TENxVisiumHD", contains = "TENxVisiumList")
+.TENxVisiumHD <- setClass(Class = "TENxVisiumHD", contains = "TENxVisium")
 
 .getSpatialPath <- function(path, bin_size) {
     outputs <- file.path(path, "binned_outputs")
@@ -34,14 +34,26 @@
     spatf
 }
 
+.check_filter_mtx <- function(filelist, files) {
+    names(files) <- files
+    res <- lapply(files, function(file) {
+        names(filelist)[startsWith(names(filelist), file)]
+    })
+    allfiles <- Filter(length, res)
+    if (!identical(length(allfiles), length(files)))
+        stop(
+            "'TENxFileList' does not contain the expected files:\n  ",
+            .FEATURE_BC_MATRIX_FILES_PRINT
+        )
+    filelist[unlist(allfiles[files], use.names = FALSE)]
+}
+
 .find_convert_resources_hd <-
     function(path, processing, format, bin_size, ...)
 {
     if (!is(path, "TENxFileList")) {
         squaref <- .getSpatialPath(path, bin_size) |> dirname()
-        path <- vapply(
-            squaref, .find_file_or_dir, character(1L), processing, format
-        )
+        path <-  .find_file_or_dir(squaref, processing, format)
         fdirname <- paste0(processing, "_feature_bc_matrix")
         if (
             !all(dir.exists(file.path(squaref, fdirname))) ||
@@ -52,40 +64,19 @@
                 "\n  Verify 'spacerangerOut' and 'processing' inputs.",
                 call. = FALSE
             )
-        path <- file.path(squaref, fdirname)
     } else {
-        if (!all(.FEATURE_BC_MATRIX_FILES %in% names(path)))
-            stop(
-                "'TENxFileList' does not contain the expected files:\n  ",
-                .FEATURE_BC_MATRIX_FILES_PRINT
-            )
-        path <- path[.FEATURE_BC_MATRIX_FILES]
+        path <- .check_filter_mtx(path, .FEATURE_BC_MATRIX_FILES)
     }
-    FileFUN <- if (identical(unique(tools::file_ext(path)), "h5"))
-            function(x) { TENxH5(x, ranges = NA_character_) }
-        else if (identical(unique(tools::file_ext(path)), ""))
-            TENxFileList
-
-    mapply(
-        FileFUN,
-        path,
-        MoreArgs = list(...),
-        SIMPLIFY = FALSE
-    )
+    path
 }
 
 .find_convert_spatial_hd <- function(path, bin_size, ...) {
     if (!is(path, "TENxFileList")) {
         path <- .getSpatialPath(path, bin_size)
     } else {
-        path <- path[!names(path) %in% .FEATURE_BC_MATRIX_FILES]
+        path <- .check_filter_mtx(path, .FEATURE_BC_MATRIX_FILES)
     }
-    mapply(
-        TENxSpatialList,
-        path,
-        MoreArgs = list(...),
-        SIMPLIFY = FALSE
-    )
+    TENxSpatialList(path, ...)
 }
 
 #' @rdname TENxVisiumHD-class
@@ -103,9 +94,47 @@
 #'     "extdata", package = "VisiumIO", mustWork = TRUE
 #' )
 #'
+#' ## with spacerangerOut folder
 #' TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres")
 #'
 #' TENxVisiumHD(spacerangerOut = vdir, bin_size = "002", images = "lowres") |>
+#'     import()
+#'
+#' ## indicate h5 format
+#' TENxVisiumHD(
+#'     spacerangerOut = vdir, bin_size = "002",
+#'     images = "lowres", format = "h5"
+#' )
+#'
+#' TENxVisiumHD(
+#'     spacerangerOut = vdir, bin_size = "002",
+#'     images = "lowres", format = "h5"
+#' ) |>
+#'     import()
+#'
+#' ## use resources and spatialResource arguments as file paths
+#' TENxVisiumHD(
+#'     resources = file.path(
+#'         vdir, "binned_outputs", "square_002um",
+#'         "filtered_feature_bc_matrix.h5"
+#'     ),
+#'     spatialResource = "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/",
+#'     bin_size = "002", processing = "filtered",
+#'     images = "lowres", format = "h5"
+#' ) |>
+#'     import()
+#'
+#' ## provide the spatialResource argument as a TENxFileList
+#' TENxVisiumHD(
+#'     resources = file.path(
+#'         vdir, "binned_outputs", "square_002um",
+#'         "filtered_feature_bc_matrix.h5"
+#'     ),
+#'     spatialResource = TENxFileList(
+#'         "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/"
+#'     ),
+#'     bin_size = "002", images = "lowres", format = "h5"
+#' ) |>
 #'     import()
 #'
 #' @export
@@ -126,6 +155,7 @@ TENxVisiumHD <- function(
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
     bin_size <- match.arg(bin_size)
+    format <- match.arg(format)
 
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
@@ -142,12 +172,17 @@ TENxVisiumHD <- function(
     } else {
         stopifnot(
             (isScalarCharacter(resources) && file.exists(resources)) ||
-                is(resources, "TENxFileList"),
+                is(resources, "TENxFileList_OR_TENxH5"),
             (isScalarCharacter(spatialResource) &&
                 file.exists(spatialResource)) ||
-                    is(spatialResource, "TENxSpatialList")
+                    is(spatialResource, "TENxFileList")
         )
-        if (!is(resources, "TENxFileList"))
+        if (
+            !is(resources, "TENxFileList_OR_TENxH5") &&
+            identical(tools::file_ext(resources), "h5")
+        )
+            resources <- TENxH5(resources, ranges = NA_character_)
+        else if (is.character(resources))
             resources <- TENxFileList(resources, ...)
         if (!is(spatialResource, "TENxSpatialList"))
             spatialResource <- TENxSpatialList(
@@ -157,19 +192,20 @@ TENxVisiumHD <- function(
             )
     }
 
-    txvList <- mapply(
-        .TENxVisium,
+    txv <- TENxVisium(
         resources = resources,
-        spatialList = spatialResource,
-        MoreArgs = list(
-            coordNames = spatialCoordsNames,
-            sampleId = sample_id
-        )
+        spatialResource = spatialResource,
+        sampleId = sample_id,
+        processing = processing,
+        format = format,
+        images = images,
+        jsonFile = jsonFile,
+        tissuePattern = tissuePattern,
+        spatialCoordsNames = spatialCoordsNames,
+        ...
     )
 
-    .TENxVisiumHD(
-        VisiumList = SimpleList(txvList)
-    )
+    .TENxVisiumHD(txv)
 }
 
 #' @describeIn TENxVisiumHD-class Import Visium HD data from multiple bin sizes
@@ -178,6 +214,5 @@ TENxVisiumHD <- function(
 #'
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
-    SElist <- lapply(con@VisiumList, import)
-    do.call(cbind, SElist)
+    methods::callNextMethod()
 })
