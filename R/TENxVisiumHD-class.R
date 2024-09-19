@@ -34,18 +34,36 @@
     spatf
 }
 
-.check_filter_mtx <- function(filelist, files) {
+.filter_sort_mtx_files <- function(namesvec) {
+    files <- .FEATURE_BC_MATRIX_FILES
     names(files) <- files
     res <- lapply(files, function(file) {
-        names(filelist)[startsWith(names(filelist), file)]
+        namesvec[startsWith(namesvec, file)]
     })
-    allfiles <- Filter(length, res)
-    if (!identical(length(allfiles), length(files)))
+    unlist(res)
+}
+
+.exclude_mtx_files <- function(filelist) {
+    files <- .FEATURE_BC_MATRIX_FILES
+    names(files) <- files
+    res <- lapply(files, function(file) {
+        startsWith(names(filelist), file)
+    })
+    filelist[!Reduce(`|`, res)]
+}
+
+.exclude_h5_files <- function(filelist) {
+    filelist[tools::file_ext(names(filelist)) != "h5"]
+}
+
+.check_filter_mtx <- function(filelist) {
+    afiles <- .filter_sort_mtx_files(names(filelist))
+    if (!identical(names(afiles), .FEATURE_BC_MATRIX_FILES))
         stop(
             "'TENxFileList' does not contain the expected files:\n  ",
             .FEATURE_BC_MATRIX_FILES_PRINT
         )
-    filelist[unlist(allfiles[files], use.names = FALSE)]
+    filelist[afiles]
 }
 
 .find_convert_resources_hd <-
@@ -65,7 +83,7 @@
                 call. = FALSE
             )
     } else {
-        path <- .check_filter_mtx(path, .FEATURE_BC_MATRIX_FILES)
+        path <- .check_filter_mtx(path)
     }
     path
 }
@@ -74,7 +92,8 @@
     if (!is(path, "TENxFileList")) {
         path <- .getSpatialPath(path, bin_size)
     } else {
-        path <- .check_filter_mtx(path, .FEATURE_BC_MATRIX_FILES)
+        path <- .exclude_mtx_files(path)
+        path <- .exclude_h5_files(path)
     }
     TENxSpatialList(path, ...)
 }
@@ -207,6 +226,8 @@ TENxVisiumHD <- function(
 
     .TENxVisiumHD(txv)
 }
+
+# import TENxVisiumHD method ----------------------------------------------
 
 #' @describeIn TENxVisiumHD-class Import Visium HD data from multiple bin sizes
 #'

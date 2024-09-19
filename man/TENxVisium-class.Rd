@@ -120,7 +120,7 @@ tv <- TENxVisium(
 
 import(tv)
 
-## with TENxFileList
+## with TENxFileList spacerangerOut input
 tvfl <- TENxVisium(
     spacerangerOut = TENxFileList(sample_dir),
     format = "mtx",
@@ -134,6 +134,18 @@ import(tvfl)
 tvfl <- TENxVisium(
     spacerangerOut = sample_dir,
     format = "h5",
+    processing = "raw",
+    images = "lowres"
+)
+
+import(tvfl)
+
+rffolder <- file.path(sample_dir, "outs", "raw_feature_bc_matrix")
+## using resources and spatialResource inputs
+tvfl <- TENxVisium(
+    resources = rffolder,
+    spatialResource = file.path(dirname(rffolder), "spatial"),
+    format = "mtx",
     processing = "raw",
     images = "lowres"
 )

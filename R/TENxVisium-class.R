@@ -72,15 +72,6 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     path
 }
 
-.filter_mtx_filelist <- function(path) {
-    if (!all(.FEATURE_BC_MATRIX_FILES %in% names(path)))
-        stop(
-            "'TENxFileList' does not contain the expected files:\n  ",
-            .FEATURE_BC_MATRIX_FILES_PRINT
-        )
-    path[.FEATURE_BC_MATRIX_FILES]
-}
-
 .filter_h5_files <- function(path, processing, format) {
     fname <- paste0(processing, "_feature_bc_matrix", ".", format)
     ish5file <- endsWith(names(path), fname)
@@ -101,7 +92,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
         }
     }
     if (identical(format, "mtx"))
-        path <- .filter_mtx_filelist(path)
+        path <- .check_filter_mtx(path)
     path
 }
 
@@ -113,7 +104,8 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
         else
             stop("The 'outs' directory was not found")
     } else {
-        path <- path[!names(path) %in% .FEATURE_BC_MATRIX_FILES]
+        path <- .exclude_mtx_files(path)
+        path <- .exclude_h5_files(path)
     }
     TENxSpatialList(path, ...)
 }
@@ -169,7 +161,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' import(tv)
 #'
-#' ## with TENxFileList
+#' ## with TENxFileList spacerangerOut input
 #' tvfl <- TENxVisium(
 #'     spacerangerOut = TENxFileList(sample_dir),
 #'     format = "mtx",
@@ -183,6 +175,18 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #' tvfl <- TENxVisium(
 #'     spacerangerOut = sample_dir,
 #'     format = "h5",
+#'     processing = "raw",
+#'     images = "lowres"
+#' )
+#'
+#' import(tvfl)
+#'
+#' rffolder <- file.path(sample_dir, "outs", "raw_feature_bc_matrix")
+#' ## using resources and spatialResource inputs
+#' tvfl <- TENxVisium(
+#'     resources = rffolder,
+#'     spatialResource = file.path(dirname(rffolder), "spatial"),
+#'     format = "mtx",
 #'     processing = "raw",
 #'     images = "lowres"
 #' )
@@ -230,7 +234,7 @@ TENxVisium <- function(
             identical(tools::file_ext(resources), "h5")
         )
             resources <- TENxH5(resources, ranges = NA_character_)
-        else if (is.character(resources))
+        else if (isScalarCharacter(resources))
             resources <- TENxFileList(resources, ...)
         if (!is(spatialResource, "TENxSpatialList"))
             spatialResource <- TENxSpatialList(
@@ -260,6 +264,9 @@ TENxVisium <- function(
 }
 
 S4Vectors::setValidity2("TENxVisium", .validTENxVisium)
+
+
+# import TENxVisium method ------------------------------------------------
 
 #' @describeIn TENxVisium-class Import Visium data
 #'
