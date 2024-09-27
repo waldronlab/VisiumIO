@@ -137,7 +137,10 @@
 #'         vdir, "binned_outputs", "square_002um",
 #'         "filtered_feature_bc_matrix.h5"
 #'     ),
-#'     spatialResource = "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/",
+#'     spatialResource = file.path(
+#'         vdir, "binned_outputs", "square_002um",
+#'         "spatial"
+#'     ),
 #'     bin_size = "002", processing = "filtered",
 #'     images = "lowres", format = "h5"
 #' ) |>
