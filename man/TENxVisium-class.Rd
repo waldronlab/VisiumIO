@@ -96,7 +96,8 @@ arguments are paths to files.
 \section{Slots}{
 
 \describe{
-\item{\code{resources}}{A \link{TENxFileList} object containing the Visium data.}
+\item{\code{resources}}{A \link{TENxFileList} or \link{TENxH5} object containing the Visium
+data.}
 
 \item{\code{spatialList}}{A \link{TENxSpatialList} object containing the spatial}
 

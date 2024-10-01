@@ -15,7 +15,8 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'   `spacerangerOut` argument or both the `resources` and `spatialResource`
 #'   arguments are paths to files.
 #'
-#' @slot resources A [TENxFileList] object containing the Visium data.
+#' @slot resources A [TENxFileList] or [TENxH5] object containing the Visium
+#'   data.
 #'
 #' @slot spatialList A [TENxSpatialList] object containing the spatial
 #'
