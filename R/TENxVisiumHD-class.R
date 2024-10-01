@@ -153,7 +153,10 @@
 #'         "filtered_feature_bc_matrix.h5"
 #'     ),
 #'     spatialResource = TENxFileList(
-#'         "~/gh/VisiumIO/inst/extdata/binned_outputs/square_002um/spatial/"
+#'         file.path(
+#'             vdir, "binned_outputs", "square_002um",
+#'             "spatial"
+#'         )
 #'     ),
 #'     bin_size = "002", images = "lowres", format = "h5"
 #' ) |>
