@@ -19,6 +19,14 @@
 #'
 #' @slot colnames `character()` A vector specifying the column names of the CSV
 #'
+#' @slot variant `character(1)` A scalar specifying the variant of the CSV file
+#'   "positions", "cell_boundaries", or "other". The variant is determined by
+#'   the name of the CSV file within the constructor function. Values include
+#'   "positions", "cell_boundaries", and "other".
+#'
+#' @slot compressed `logical(1)` A scalar specifying whether the CSV is
+#'   compressed (mainly with a `.gz` file extension).
+#'
 #' @importClassesFrom TENxIO TENxFile
 #' @importFrom methods new is
 #'
@@ -28,7 +36,9 @@
     contains = "TENxFile",
     slots = c(
         isList = "logical",
-        colnames = "character"
+        colnames = "character",
+        variant = "character",
+        compressed = "logical"
     )
 )
 
@@ -43,7 +53,9 @@
 #'
 #' @param colnames `character()` A vector specifying the column names of the
 #'   CSV, defaults to `c("barcode", "in_tissue", "array_row", "array_col",
-#'   "pxl_row_in_fullres", "pxl_col_in_fullres")`.
+#'   "pxl_row_in_fullres", "pxl_col_in_fullres")`. Mainly used for the
+#'   "positions" CSV type of file which does not include column names in the
+#'   file.
 #'
 #' @importFrom TENxIO TENxFile
 #' @importFrom BiocGenerics path
@@ -66,9 +78,18 @@
 TENxSpatialCSV <- function(resource, colnames = .TISSUE_POS_COLS) {
     if (!is(resource, "TENxFile"))
         resource <- TENxFile(resource)
+    variant <- "other"
+    filename <- basename(path(resource))
+    if (grepl("positions", fixed = TRUE, filename))
+        variant <- "positions"
+    else if (grepl("cell_boundaries", fixed = TRUE, filename))
+        variant <- "cell_boundaries"
+
+    isCompressed <- endsWith(path(resource), "gz")
     isList <- grepl("_list", path(resource), fixed = TRUE)
     .TENxSpatialCSV(
-        resource, isList = isList, colnames = colnames
+        resource, isList = isList, variant = variant,
+        compressed = isCompressed, colnames = colnames
     )
 }
 
@@ -82,11 +103,11 @@ TENxSpatialCSV <- function(resource, colnames = .TISSUE_POS_COLS) {
 #' @importFrom S4Vectors DataFrame
 #' @exportMethod import
 setMethod("import", "TENxSpatialCSV", function(con, format, text, ...) {
-    dat <- utils::read.csv(
-        path(con),
-        header = !con@isList,
-        row.names = 1L,
-        col.names = con@colnames
-    )
+    args <- list(file = path(con), header = !con@isList, row.names = 1L)
+    if (identical(con@variant, "positions"))
+        args <- c(args, list(col.names = con@colnames))
+    else if (identical(con@variant, "cell_boundaries"))
+        args <- args[names(args) != "row.names"]
+    dat <- do.call(utils::read.csv, args)
     DataFrame(dat)
 })

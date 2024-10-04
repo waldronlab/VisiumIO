@@ -16,7 +16,9 @@ TENxSpatialCSV(resource, colnames = .TISSUE_POS_COLS)
 \item{resource}{character(1) The path to the file}
 
 \item{colnames}{\code{character()} A vector specifying the column names of the
-CSV, defaults to \code{c("barcode", "in_tissue", "array_row", "array_col", "pxl_row_in_fullres", "pxl_col_in_fullres")}.}
+CSV, defaults to \code{c("barcode", "in_tissue", "array_row", "array_col", "pxl_row_in_fullres", "pxl_col_in_fullres")}. Mainly used for the
+"positions" CSV type of file which does not include column names in the
+file.}
 
 \item{con}{The connection from which data is loaded or to which data is
 saved. If this is a \code{character} vector, it is assumed to be a file name and
@@ -60,6 +62,14 @@ changed by specifying the \code{colnames} argument in the constructor function.
 of file}
 
 \item{\code{colnames}}{\code{character()} A vector specifying the column names of the CSV}
+
+\item{\code{variant}}{\code{character(1)} A scalar specifying the variant of the CSV file
+"positions", "cell_boundaries", or "other". The variant is determined by
+the name of the CSV file within the constructor function. Values include
+"positions", "cell_boundaries", and "other".}
+
+\item{\code{compressed}}{\code{logical(1)} A scalar specifying whether the CSV is
+compressed (mainly with a \code{.gz} file extension).}
 }}
 
 \examples{
