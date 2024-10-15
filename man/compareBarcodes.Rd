@@ -5,34 +5,31 @@
 \title{Compare barcodes between raw and filtered data}
 \usage{
 compareBarcodes(
-  raw_filt_resources,
+  from_resource,
+  to_resource,
   spacerangerOut,
   processing = c("raw", "filtered"),
-  outs = "outs",
   ...
 )
 }
 \arguments{
-\item{raw_filt_resources}{\code{character(2)} A vector of length 2, where the
-first element is the path to the \strong{raw} resources and the second element
-is the path to the \strong{filtered} resources. If the resources are already
-converted to \code{TENxFileList} objects, then this argument can be a list of
-length 2, where the first element is the raw resources and the second
-element is the filtered resources.}
+\item{from_resource}{\code{character(1)} The path to the resource file whose
+barcodes are used as the basis of the comparison; typically, the "raw"
+feature barcodes are used.}
+
+\item{to_resource}{\code{character(1)} The path to the resource file whose
+barcodes are compared to the \code{from_resource}; typically, the "filtered"
+feature barcodes.}
 
 \item{spacerangerOut}{\code{character(1)} A scalar vector specifying the path
-to the \code{spaceranger} output directory.}
+to the \verb{space ranger} output directory.}
 
 \item{processing}{\code{character(2)} A vector of length 2 that corresponds to the
 processing type. The processing types are typically "raw" and "filtered".
 These are the prefixes of the folder names \code{raw_feature_bc_matrix} and
 \code{filtered_feature_bc_matrix}. The order of the vector determines the
-comparison. For example, if \code{processing = c("raw", "filtered")}, then the
-barcodes in the raw data are compared to the filtered data. Default is
-\code{c("raw", "filtered")}.}
-
-\item{outs}{\code{character(1)} A single string specifying the name of the
-\code{spaceranger} output directory. Default is "outs".}
+comparison. By default, \code{processing = c("raw", "filtered")}, which means
+barcodes in the raw data are compared to the filtered data.}
 }
 \value{
 A \code{data.frame} with barcodes of the first element in the \code{processing}
@@ -52,12 +49,10 @@ barcodes in the filtered data are marked as \code{TRUE} in the resulting
 \examples{
 if (interactive()) {
     compareBarcodes(
-        raw_filt_resources = c(
-            "~/data/V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
-            "~/data/V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz"
-        ),
-        processing = c("raw", "filtered"),
-        outs = "outs"
+        from_resource =
+            "./V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
+        to_resource =
+            "./V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
     ) |>
     head()
 }
