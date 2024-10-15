@@ -10,6 +10,15 @@
     res_frame
 }
 
+.get_processing_type <- function(filepath) {
+    filename <- basename(filepath)
+    splitname <- strsplit(filename, "_")[[1L]]
+    haskey <- splitname %in% c("raw", "filtered")
+    if (!identical(sum(haskey), 1L))
+        stop("'processing' type could not be determined from the file name.")
+    splitname[haskey]
+}
+
 #' Compare barcodes between raw and filtered data
 #'
 #' @description This function compares the barcodes between raw and filtered
@@ -18,26 +27,23 @@
 #'  barcodes in the filtered data are marked as `TRUE` in the resulting
 #'  `data.frame`.
 #'
-#' @param raw_filt_resources `character(2)` A vector of length 2, where the
-#'   first element is the path to the **raw** resources and the second element
-#'   is the path to the **filtered** resources. If the resources are already
-#'   converted to `TENxFileList` objects, then this argument can be a list of
-#'   length 2, where the first element is the raw resources and the second
-#'   element is the filtered resources.
+#' @param from_resource `character(1)` The path to the resource file whose
+#'   barcodes are used as the basis of the comparison; typically, the "raw"
+#'   feature barcodes are used.
+#'
+#' @param to_resource `character(1)` The path to the resource file whose
+#'   barcodes are compared to the `from_resource`; typically, the "filtered"
+#'   feature barcodes.
 #'
 #' @param spacerangerOut `character(1)` A scalar vector specifying the path
-#'   to the `spaceranger` output directory.
+#'   to the `space ranger` output directory.
 #'
 #' @param processing `character(2)` A vector of length 2 that corresponds to the
 #'   processing type. The processing types are typically "raw" and "filtered".
 #'   These are the prefixes of the folder names `raw_feature_bc_matrix` and
 #'   `filtered_feature_bc_matrix`. The order of the vector determines the
-#'   comparison. For example, if `processing = c("raw", "filtered")`, then the
-#'   barcodes in the raw data are compared to the filtered data. Default is
-#'   `c("raw", "filtered")`.
-#'
-#' @param outs `character(1)` A single string specifying the name of the
-#'   `spaceranger` output directory. Default is "outs".
+#'   comparison. By default, `processing = c("raw", "filtered")`, which means
+#'   barcodes in the raw data are compared to the filtered data.
 #'
 #' @return A `data.frame` with barcodes of the first element in the `processing`
 #'   data type as the first column and a logical vector indicating whether the
@@ -49,46 +55,42 @@
 #' @examples
 #' if (interactive()) {
 #'     compareBarcodes(
-#'         raw_filt_resources = c(
-#'             "~/data/V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
-#'             "~/data/V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz"
-#'         ),
-#'         processing = c("raw", "filtered"),
-#'         outs = "outs"
+#'         from_resource =
+#'             "./V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
+#'         to_resource =
+#'             "./V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
 #'     ) |>
 #'     head()
 #' }
 #' @export
 compareBarcodes <- function(
-    raw_filt_resources, spacerangerOut,
-    processing = c("raw", "filtered"), outs = "outs", ...
+    from_resource, to_resource, spacerangerOut,
+    processing = c("raw", "filtered"),
+    ...
 ) {
-    if (!identical(length(processing), 2L))
-        stop("Length of 'processing' must be 2, e.g., c('raw', 'filtered')")
-    res <- structure(vector("list", 2L), .Names = processing)
+    stopifnot(all(c("raw", "filtered") %in% processing))
+    res <- structure(vector("list", length = 2L), .Names = processing)
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
             stopifnot(dir.exists(spacerangerOut))
-        for (process in processing) {
+        for (process in processing)
             res[[process]] <-
                 .find_convert_resources(spacerangerOut, process, ...)
-        }
     } else {
-        if (
-            !identical(length(raw_filt_resources), 2L) &&
-            isCharacter(raw_filt_resources)
+        if (missing(from_resource) || missing(to_resource))
+            stop("Both *_resource arguments must be provided")
+        stopifnot(
+            isScalarCharacter(from_resource), isScalarCharacter(to_resource),
+            file.exists(from_resource), file.exists(to_resource)
         )
-            stop("'raw_filt_resources' must be a character vector of length 2")
-        keywordInFile <- mapply(
-            function(file, proc) {
-                grepl(pattern = proc, x = file, fixed = TRUE)
-            }, raw_filt_resources, processing
+        resources <- c(from_resource, to_resource)
+        rnames <- vapply(resources, .get_processing_type, character(1))
+        names(resources) <- rnames
+        message(
+            "Comparing 'processing' types from ", rnames[1], " to ", rnames[2]
         )
-        if (!all(keywordInFile))
-            stop("No 'processing' match in 'raw_filt_resources' file names")
         for (process in processing) {
-            file <- grep(process, raw_filt_resources, value = TRUE)
-            txfl <- TENxFileList(file)
+            txfl <- TENxFileList(resources[process])
             if (txfl@compressed)
                 res[[process]] <- decompress(con = txfl)
             else
