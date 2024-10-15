@@ -68,7 +68,10 @@ compareBarcodes <- function(
     processing = c("raw", "filtered"),
     ...
 ) {
-    stopifnot(all(c("raw", "filtered") %in% processing))
+    stopifnot(
+        all(c("raw", "filtered") %in% processing),
+        identical(length(processing), 2L)
+    )
     res <- structure(vector("list", length = 2L), .Names = processing)
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
