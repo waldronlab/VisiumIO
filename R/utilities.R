@@ -19,6 +19,42 @@
     splitname[haskey]
 }
 
+.file_or_filelist <- function(path, process, format, ...) {
+    if (identical(tools::file_ext(path), "h5")) {
+        path <- TENxH5(path, ranges = NA_character_, ...)
+    } else if (file.exists(path) && isScalarCharacter(path)) {
+        if (identical(tools::file_ext(path), "gz"))
+            path <- decompress(con = TENxFileList(path, ...))
+        path <- .find_convert_resources(path, process, format, ...)
+    } else {
+        stop("The path is not a 'spacerangerOut' directory or an HDF5 file.")
+    }
+    path
+}
+
+.filter_import_bcode <- function(filelist) {
+    files <- path(filelist)
+    isbcode <- startsWith(names(filelist), "barcode")
+    bcode <- TENxFile(files[isbcode])
+    bcodes <- import(bcode)
+    bcol <- if ("barcode" %in% names(bcodes)) "barcode" else 1L
+    bcodes[[bcol]]
+}
+
+.get_bcode_list <- function(res_list) {
+    lapply(
+        res_list, function(res) {
+            if (is(res, "TENxFileList")) {
+                .filter_import_bcode(res)
+            } else if (is(res, "TENxH5")) {
+                colnames(res)
+            } else {
+                stop("The resource is not a 'TENxFileList' or 'TENxH5' object.")
+            }
+        }
+    )
+}
+
 #' Compare barcodes between raw and filtered data
 #'
 #' @description This function compares the barcodes between raw and filtered
@@ -35,8 +71,7 @@
 #'   barcodes are compared to the `from_resource`; typically, the "filtered"
 #'   feature barcodes.
 #'
-#' @param spacerangerOut `character(1)` A scalar vector specifying the path
-#'   to the `space ranger` output directory.
+#' @inheritParams TENxVisium
 #'
 #' @param processing `character(2)` A vector of length 2 that corresponds to the
 #'   processing type. The processing types are typically "raw" and "filtered".
@@ -45,26 +80,43 @@
 #'   comparison. By default, `processing = c("raw", "filtered")`, which means
 #'   barcodes in the raw data are compared to the filtered data.
 #'
+#' @param ... Additional arguments passed to `TENxH5` or `TENxFileList`.
+#'
 #' @return A `data.frame` with barcodes of the first element in the `processing`
 #'   data type as the first column and a logical vector indicating whether the
-#'   barcodes are found in the second element in `processing`. For example,
-#'   if processing is `c("raw", "filtered")`, then the first column will be the
+#'   barcodes are found in the second element in `processing`. For example, if
+#'   processing is `c("raw", "filtered")`, then the first column will be the
 #'   barcodes in the `raw` data and the second column will be a logical vector
 #'   indicating whether the barcodes are found in the `filtered` data.
 #'
 #' @examples
 #' if (interactive()) {
 #'     compareBarcodes(
-#'         from_resource =
-#'             "./V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
+#'         from_resource = "V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
 #'         to_resource =
-#'             "./V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
-#'     ) |>
-#'     head()
+#'             "V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
+#'     )
+#'
+#'     compareBarcodes(
+#'         from_resource =
+#'             "V1_Adult_Mouse_Brain_raw_feature_bc_matrix.h5",
+#'         to_resource =
+#'             "V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.h5"
+#'     )
+#'
+#'     compareBarcodes(spacerangerOut = "~/data/outs", format = "h5")
+#'
+#'     compareBarcodes(
+#'         spacerangerOut = "~/data/feature_bc_matrix", format = "mtx"
+#'     )
+#'
+#'     compareBarcodes(
+#'         spacerangerOut = "~/data/folder_feature_bc_matrix", format = "mtx"
+#'     )
 #' }
 #' @export
 compareBarcodes <- function(
-    from_resource, to_resource, spacerangerOut,
+    from_resource, to_resource, spacerangerOut, format = c("mtx", "h5"),
     processing = c("raw", "filtered"),
     ...
 ) {
@@ -72,13 +124,18 @@ compareBarcodes <- function(
         all(c("raw", "filtered") %in% processing),
         identical(length(processing), 2L)
     )
+    format <- match.arg(format)
     res <- structure(vector("list", length = 2L), .Names = processing)
     if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
             stopifnot(dir.exists(spacerangerOut))
+        message(
+            "Comparing 'processing' types from ",
+            processing[1], " to ", processing[2]
+        )
         for (process in processing)
             res[[process]] <-
-                .find_convert_resources(spacerangerOut, process, ...)
+                .find_file_or_dir(spacerangerOut, process, format, ...)
     } else {
         if (missing(from_resource) || missing(to_resource))
             stop("Both *_resource arguments must be provided")
@@ -93,19 +150,11 @@ compareBarcodes <- function(
             "Comparing 'processing' types from ", rnames[1], " to ", rnames[2]
         )
         for (process in processing) {
-            txfl <- TENxFileList(resources[process])
-            if (txfl@compressed)
-                res[[process]] <- decompress(con = txfl)
-            else
-                res[[process]] <- txfl
+            res[[process]] <- .file_or_filelist(
+                resources[process], process, format, ...
+            )
         }
     }
-
-    bcode_files <- lapply(
-        res, function(x) {
-            TENxFile(path(x)[startsWith(names(x), "barcode")])
-        }
-    )
-    bcode_frames <- lapply(bcode_files, import)
-    .compare_list_bcodes(bcode_frames)
+    bcode_list <- .get_bcode_list(res)
+    .compare_list_bcodes(bcode_list)
 }

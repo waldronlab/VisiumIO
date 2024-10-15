@@ -8,6 +8,7 @@ compareBarcodes(
   from_resource,
   to_resource,
   spacerangerOut,
+  format = c("mtx", "h5"),
   processing = c("raw", "filtered"),
   ...
 )
@@ -21,8 +22,14 @@ feature barcodes are used.}
 barcodes are compared to the \code{from_resource}; typically, the "filtered"
 feature barcodes.}
 
-\item{spacerangerOut}{\code{character(1)} A scalar vector specifying the path
-to the \verb{space ranger} output directory.}
+\item{spacerangerOut}{\code{character(1)} A single string specifying the path to
+the sample directory of \verb{spaceranger count}. The directory must contain the
+\verb{(processing)_feature_bc_matrix} and \code{spatial} sub directories in addition
+to the \code{outs} folder.}
+
+\item{format}{The format of the output. If missing and \code{con} is a
+file name, the format is derived from the file extension. This argument is
+unnecessary when \code{con} is a derivative of \linkS4class{BiocFile}.}
 
 \item{processing}{\code{character(2)} A vector of length 2 that corresponds to the
 processing type. The processing types are typically "raw" and "filtered".
@@ -30,12 +37,14 @@ These are the prefixes of the folder names \code{raw_feature_bc_matrix} and
 \code{filtered_feature_bc_matrix}. The order of the vector determines the
 comparison. By default, \code{processing = c("raw", "filtered")}, which means
 barcodes in the raw data are compared to the filtered data.}
+
+\item{...}{Additional arguments passed to \code{TENxH5} or \code{TENxFileList}.}
 }
 \value{
 A \code{data.frame} with barcodes of the first element in the \code{processing}
 data type as the first column and a logical vector indicating whether the
-barcodes are found in the second element in \code{processing}. For example,
-if processing is \code{c("raw", "filtered")}, then the first column will be the
+barcodes are found in the second element in \code{processing}. For example, if
+processing is \code{c("raw", "filtered")}, then the first column will be the
 barcodes in the \code{raw} data and the second column will be a logical vector
 indicating whether the barcodes are found in the \code{filtered} data.
 }
@@ -49,11 +58,26 @@ barcodes in the filtered data are marked as \code{TRUE} in the resulting
 \examples{
 if (interactive()) {
     compareBarcodes(
-        from_resource =
-            "./V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
+        from_resource = "V1_Adult_Mouse_Brain_raw_feature_bc_matrix.tar.gz",
         to_resource =
-            "./V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
-    ) |>
-    head()
+            "V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.tar.gz",
+    )
+
+    compareBarcodes(
+        from_resource =
+            "V1_Adult_Mouse_Brain_raw_feature_bc_matrix.h5",
+        to_resource =
+            "V1_Adult_Mouse_Brain_filtered_feature_bc_matrix.h5"
+    )
+
+    compareBarcodes(spacerangerOut = "~/data/outs", format = "h5")
+
+    compareBarcodes(
+        spacerangerOut = "~/data/feature_bc_matrix", format = "mtx"
+    )
+
+    compareBarcodes(
+        spacerangerOut = "~/data/folder_feature_bc_matrix", format = "mtx"
+    )
 }
 }

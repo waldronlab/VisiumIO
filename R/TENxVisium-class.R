@@ -48,7 +48,6 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
 .find_file_or_dir <- function(reldir, processing, format, ...) {
     fdirname <- paste0(processing, "_feature_bc_matrix")
-    fileordir <- file.path(reldir, fdirname)
     if (identical(format, "h5")) {
         fnamepat <- paste0(processing, "_feature_bc_matrix\\.", format, "$")
         h5file <- list.files(
@@ -62,13 +61,23 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
             )
         path <- TENxIO::TENxH5(h5file, ranges = NA_character_, ...)
     } else if (identical(format, "mtx")) {
-        if (!dir.exists(fileordir))
+        mtxdirs <- list.files(
+            reldir, recursive = FALSE, full.names = TRUE
+        )
+        hasmtx <- grepl(pattern = fdirname, x = mtxdirs, fixed = TRUE)
+        resdir <- mtxdirs[hasmtx]
+        resdir <- Filter(
+            function(path) { tools::file_ext(path) != "h5" }, resdir
+        )
+        if (!file.exists(resdir) || !length(resdir))
             stop(
                 "The '", fdirname, "' directory was not found.",
                 "\n  Verify 'spacerangerOut' and 'processing' inputs.",
                 call. = FALSE
             )
-        path <- TENxFileList(fileordir)
+        path <- TENxFileList(resdir, ...)
+        if (identical(tools::file_ext(resdir), "gz"))
+            path <- decompress(con = path)
     }
     path
 }
