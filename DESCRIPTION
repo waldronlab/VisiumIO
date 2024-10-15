@@ -45,4 +45,5 @@ Collate:
     'TENxVisium-class.R'
     'TENxVisiumList-class.R'
     'TENxVisiumHD-class.R'
+    'utilities.R'
 Date: 2024-10-04
