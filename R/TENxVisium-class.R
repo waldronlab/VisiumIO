@@ -59,7 +59,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
                 "\n  Verify 'spacerangerOut' and 'processing' inputs.",
                 call. = FALSE
             )
-        path <- TENxIO::TENxH5(h5file, ranges = NA_character_, ...)
+        path <- TENxH5(h5file, ranges = NA_character_, ...)
     } else if (identical(format, "mtx")) {
         mtxdirs <- list.files(
             reldir, recursive = FALSE, full.names = TRUE
@@ -90,7 +90,6 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     path(path[ish5file])
 }
 
-#' @importFrom TENxIO TENxFileList TENxH5
 .find_convert_resources <- function(path, processing, format, ...) {
     if (!is(path, "TENxFileList")) {
         odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
