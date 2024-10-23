@@ -81,6 +81,9 @@
 #' TENxSpatialCSV(csvresource)
 #' head(import(TENxSpatialCSV(csvresource)), 4)
 #'
+#' import(TENxSpatialCSV(csvresource)) |>
+#'     attr("metadata") |>
+#'     lapply(names)
 #' @export
 TENxSpatialCSV <- function(resource, colnames = .TISSUE_POS_COLS) {
     if (!is(resource, "TENxFile"))
@@ -139,5 +142,6 @@ setMethod("import", "TENxSpatialCSV", function(con, format, text, ...) {
         rownames(res) <- res[["barcode"]]
         res <- res[, names(res) != "barcode", drop = FALSE]
     }
+    metadata(res) <- metadata(con)
     res
 })

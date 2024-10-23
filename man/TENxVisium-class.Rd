@@ -131,6 +131,11 @@ tvfl <- TENxVisium(
 
 import(tvfl)
 
+## check metadata of the object
+import(tvfl) |>
+    metadata() |>
+    lapply(names)
+
 ## importing h5 format
 tvfl <- TENxVisium(
     spacerangerOut = sample_dir,

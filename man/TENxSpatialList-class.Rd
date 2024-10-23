@@ -93,12 +93,14 @@ typically a \code{.parquet} or \code{.csv} file.}
 }}
 
 \examples{
-
 spatial_dir <- system.file(
     file.path("extdata", "10xVisium", "section1", "outs", "spatial"),
     package = "SpatialExperiment"
 )
 
 TENxSpatialList(resources = spatial_dir, images = "lowres")
+
+TENxSpatialList(resources = spatial_dir, images = "lowres") |>
+    metadata() |> lapply(names)
 
 }

@@ -91,4 +91,7 @@ csvresource <- file.path(spatial_dir, "tissue_positions_list.csv")
 TENxSpatialCSV(csvresource)
 head(import(TENxSpatialCSV(csvresource)), 4)
 
+import(TENxSpatialCSV(csvresource)) |>
+    attr("metadata") |>
+    lapply(names)
 }

@@ -72,4 +72,8 @@ parquetres <- file.path(spatial_dir, "tissue_positions.parquet")
 TENxSpatialParquet(parquetres)
 import(TENxSpatialParquet(parquetres))
 
+## metadata in attributes
+import(TENxSpatialParquet(parquetres)) |>
+    attr("metadata") |>
+    lapply(names)
 }

@@ -49,6 +49,10 @@
 #' TENxSpatialParquet(parquetres)
 #' import(TENxSpatialParquet(parquetres))
 #'
+#' ## metadata in attributes
+#' import(TENxSpatialParquet(parquetres)) |>
+#'     attr("metadata") |>
+#'     lapply(names)
 #' @export
 TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
     if (!is(resource, "TENxFile"))
@@ -70,7 +74,9 @@ TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
 #' @exportMethod import
 setMethod("import", "TENxSpatialParquet", function(con, format, text, ...) {
     checkInstalled("arrow")
-    arrow::read_parquet(
+    res <- arrow::read_parquet(
         path(con)
     )
+    attr(res, "metadata") <- metadata(con)
+    res
 })

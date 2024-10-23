@@ -182,6 +182,11 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' import(tvfl)
 #'
+#' ## check metadata of the object
+#' import(tvfl) |>
+#'     metadata() |>
+#'     lapply(names)
+#'
 #' ## importing h5 format
 #' tvfl <- TENxVisium(
 #'     spacerangerOut = sample_dir,
@@ -323,6 +328,10 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
         sample_id = con@sampleId,
         colData = as(spd, "DataFrame"),
         spatialCoordsNames = con@coordNames,
-        imgData = img
+        imgData = img,
+        metadata = list(
+            resources = metadata(sce),
+            spatialList = metadata(con@spatialList)
+        )
     )
 })
