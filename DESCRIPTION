@@ -28,7 +28,9 @@ Imports:
 Suggests:
     arrow,
     BiocStyle,
+    data.table,
     knitr,
+    readr,
     rmarkdown,
     tinytest
 biocViews: Software, Infrastructure, DataImport, SingleCell, Spatial

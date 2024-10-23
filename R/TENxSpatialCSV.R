@@ -57,6 +57,13 @@
 #'   "positions" CSV type of file which does not include column names in the
 #'   file.
 #'
+#' @details Set the option "VisiumIO.csvreader" to either "data.table" or
+#'   "readr" to use the `data.table::fread` or `readr::read_csv` functions,
+#'   respectively. These options are useful when the CSV file is relatively
+#'   large and the user wants to use faster read-in options. Note that the
+#'   outputs will still be converted to `DataFrame` when incorporated to the
+#'   `SpatialExperiment` or `SingleCellExperiment` object.
+#'
 #' @importFrom TENxIO TENxFile
 #' @importFrom BiocGenerics path
 #'
@@ -108,6 +115,29 @@ setMethod("import", "TENxSpatialCSV", function(con, format, text, ...) {
         args <- c(args, list(col.names = con@colnames))
     else if (identical(con@variant, "cell_boundaries"))
         args <- args[names(args) != "row.names"]
-    dat <- do.call(utils::read.csv, args)
-    DataFrame(dat)
+    if (
+        identical(getOption("VisiumIO.csvreader"), "data.table") &&
+        checkInstalled("data.table")
+    )
+        dat <- do.call(data.table::fread, args[names(args) != "row.names"])
+    else if (
+        identical(getOption("VisiumIO.csvreader"), "readr") &&
+        checkInstalled("readr")
+    )
+        dat <- do.call(
+            readr::read_csv,
+            list(
+                col_names = args[["col.names"]],
+                file = args[["file"]],
+                show_col_types = FALSE
+            )
+        )
+    else
+        dat <- do.call(utils::read.csv, args)
+    res <- DataFrame(dat)
+    if ("barcode" %in% colnames(res)) {
+        rownames(res) <- res[["barcode"]]
+        res <- res[, names(res) != "barcode", drop = FALSE]
+    }
+    res
 })

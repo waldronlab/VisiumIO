@@ -54,6 +54,13 @@ but rather use the \code{\link[=TENxVisium]{TENxVisium()}} constructor function 
 of this class in the background. The column names are set to the default
 values of \code{c("barcode", "in_tissue", "array_row", "array_col", "pxl_row_in_fullres", "pxl_col_in_fullres")}. The column names can be
 changed by specifying the \code{colnames} argument in the constructor function.
+
+Set the option "VisiumIO.csvreader" to either "data.table" or
+"readr" to use the \code{data.table::fread} or \code{readr::read_csv} functions,
+respectively. These options are useful when the CSV file is relatively
+large and the user wants to use faster read-in options. Note that the
+outputs will still be converted to \code{DataFrame} when incorporated to the
+\code{SpatialExperiment} or \code{SingleCellExperiment} object.
 }
 \section{Slots}{
 
