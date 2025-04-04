@@ -316,7 +316,7 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
         stop("No matching barcodes found between spatial and expression data.")
 
     if (is_tbl_df)
-        spd <- spd[spd[["barcode"]] %in% matches, ]
+        spd <- spd[match(matches, spd[["barcode"]]), ]
     else
         spd <- spd[matches, ]
 
