@@ -13,8 +13,9 @@
 #'
 #' @inheritParams TENxVisium
 #'
-#' @slot images `character()` The image names to use with `grep` and include in
-#'   the list of files.
+#' @slot images `character()` The image name(s) to use with `grep` and include
+#'   in the list of files. Can be one of "lowres", "hires",  "lowres", "hires",
+#'   "detected", "aligned", "aligned_fiducials", or "cytassist".
 #'
 #' @slot scaleJSON `character(1)` The file name of the scale factors JSON file,
 #'   defaults to 'scalefactors_json.json'.
@@ -95,7 +96,10 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 TENxSpatialList <- function(
     resources,
     sample_id = "sample01",
-    images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
+    images = c(
+        "lowres", "hires", "detected", "aligned",
+        "aligned_fiducials", "cytassist"
+    ),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
     bin_size = character(0L),
@@ -169,6 +173,8 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
             call. = FALSE
         )
     spi <- SpatialExperiment::SpatialImage(imgPath)
+    if (identical(image, "cytassist"))
+        image <- "regist_target"
     scaleName <- grep(image, names(scaleFx), value = TRUE)
     if (length(scaleName))
         scfactor <- unlist(scaleFx[scaleName])

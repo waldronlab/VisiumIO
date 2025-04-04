@@ -11,7 +11,7 @@
 TENxSpatialList(
   resources,
   sample_id = "sample01",
-  images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials"),
+  images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials", "cytassist"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
   bin_size = character(0L),
@@ -78,8 +78,9 @@ of this class.
 \section{Slots}{
 
 \describe{
-\item{\code{images}}{\code{character()} The image names to use with \code{grep} and include in
-the list of files.}
+\item{\code{images}}{\code{character()} The image name(s) to use with \code{grep} and include
+in the list of files. Can be one of "lowres", "hires",  "lowres", "hires",
+"detected", "aligned", "aligned_fiducials", or "cytassist".}
 
 \item{\code{scaleJSON}}{\code{character(1)} The file name of the scale factors JSON file,
 defaults to 'scalefactors_json.json'.}
