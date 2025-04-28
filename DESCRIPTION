@@ -14,7 +14,7 @@ Description: The package allows users to readily import spatial data obtained
     can be imported at once with *List type of functions. The package
     represents data mainly as SpatialExperiment objects.
 License: Artistic-2.0
-Depends: R (>= 4.4.0), TENxIO
+Depends: R (>= 4.5.0), TENxIO
 Imports:
     BiocBaseUtils,
     BiocGenerics,
