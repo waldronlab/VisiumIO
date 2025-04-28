@@ -1,6 +1,6 @@
 Package: VisiumIO
 Title: Import Visium data from the 10X Space Ranger pipeline
-Version: 1.5.0
+Version: 1.5.1
 Authors@R: c(
     person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu",
         c("aut", "cre"), c(ORCID = "0000-0002-3242-0582")
@@ -49,4 +49,4 @@ Collate:
     'TENxVisiumHD-class.R'
     'VisiumIO-package.R'
     'utilities.R'
-Date: 2025-04-04
+Date: 2025-04-28
