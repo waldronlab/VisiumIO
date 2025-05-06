@@ -15,7 +15,7 @@ TENxVisium(
   sample_id = "sample01",
   processing = c("filtered", "raw"),
   format = c("mtx", "h5"),
-  images = c("lowres", "hires", "detected", "aligned"),
+  images = c("lowres", "hires", "detected", "aligned", "cytassist"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*\\\\.csv",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
