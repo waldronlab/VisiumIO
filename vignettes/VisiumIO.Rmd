@@ -255,12 +255,16 @@ TENxVisiumHD(
 ) |> import()
 ```
 
-<details><summary>Click to expand <code>sessionInfo()</code></summary>
-
 # Session Info
 
-```{r}
-sessionInfo()
+```{r session-info, echo=FALSE, results='asis'}
+html_output <- paste0(
+    "<details><summary>",
+    "Click to expand <code>sessionInfo()</code>",
+    "</summary>\n\n",
+    "<pre><code>",
+    paste(capture.output(sessionInfo()), collapse = "\n"),
+    "</code></pre>\n</details>"
+)
+cat(html_output)
 ```
-
-</details>
