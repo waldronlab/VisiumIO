@@ -305,6 +305,11 @@ TENxVisiumHD(
 #> imgData names(4): sample_id image_id data scaleFactor
 ```
 
+<details>
+<summary>
+Click to expand <code>sessionInfo()</code>
+</summary>
+
 # Session Info
 
 ``` r
@@ -348,3 +353,5 @@ sessionInfo()
 #> [56] glue_1.8.0               rstudioapi_0.17.1        vroom_1.6.5              jsonlite_2.0.0           R6_2.6.1                
 #> [61] Rhdf5lib_1.31.0
 ```
+
+</details>
