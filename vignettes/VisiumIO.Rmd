@@ -255,9 +255,12 @@ TENxVisiumHD(
 ) |> import()
 ```
 
+<details><summary>Click to expand <code>sessionInfo()</code></summary>
+
 # Session Info
 
 ```{r}
 sessionInfo()
 ```
 
+</details>
