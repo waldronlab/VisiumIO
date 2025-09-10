@@ -1,7 +1,7 @@
 sample_dirs <- list.dirs(
     system.file(
         file.path("extdata", "10xVisium"),
-        package = "SpatialExperiment"
+        package = "VisiumIO"
     ),
     recursive = FALSE, full.names = TRUE
 )

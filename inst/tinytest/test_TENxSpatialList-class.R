@@ -1,6 +1,6 @@
 spatial_dir <- system.file(
     file.path("extdata", "10xVisium", "section1", "outs", "spatial"),
-    package = "SpatialExperiment"
+    package = "VisiumIO"
 )
 
 txsl <- TENxSpatialList(resources = spatial_dir)

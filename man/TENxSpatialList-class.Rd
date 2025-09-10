@@ -98,7 +98,7 @@ typically a \code{.parquet} or \code{.csv} file.}
 \examples{
 spatial_dir <- system.file(
     file.path("extdata", "10xVisium", "section1", "outs", "spatial"),
-    package = "SpatialExperiment"
+    package = "VisiumIO"
 )
 
 TENxSpatialList(resources = spatial_dir, images = "lowres")

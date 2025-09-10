@@ -37,7 +37,7 @@ biocViews: Software, Infrastructure, DataImport, SingleCell, Spatial
 VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 BugReports: https://github.com/waldronlab/VisiumIO/issues
 URL: https://github.com/waldronlab/VisiumIO
 Collate:

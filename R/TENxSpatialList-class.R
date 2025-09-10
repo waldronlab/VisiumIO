@@ -84,7 +84,7 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #' @examples
 #' spatial_dir <- system.file(
 #'     file.path("extdata", "10xVisium", "section1", "outs", "spatial"),
-#'     package = "SpatialExperiment"
+#'     package = "VisiumIO"
 #' )
 #'
 #' TENxSpatialList(resources = spatial_dir, images = "lowres")

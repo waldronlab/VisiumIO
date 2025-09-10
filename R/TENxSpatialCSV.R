@@ -73,7 +73,7 @@
 #' @examples
 #' sample_dir <- system.file(
 #'     file.path("extdata", "10xVisium", "section1"),
-#'     package = "SpatialExperiment"
+#'     package = "VisiumIO"
 #' )
 #' spatial_dir <- Filter(
 #'   function(x) endsWith(x, "spatial"), list.dirs(sample_dir)
