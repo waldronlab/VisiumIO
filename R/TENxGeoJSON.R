@@ -22,6 +22,19 @@
 #'
 #' @return `TENxGeoJSON()`: An object of class [TENxGeoJSON]
 #'
+#' @seealso <https://www.10xgenomics.com/support/software/xenium-ranger/3.0/analysis/segmentation-inputs>
+#'
+#' @examples
+#' segout_folder <- system.file(
+#'     file.path("extdata", "segmented_outputs"),
+#'     package = "VisiumIO"
+#' )
+#' geojsonres <- file.path(segout_folder, "cell_segmentations.geojson")
+#'
+#' TENxGeoJSON(geojsonres)
+#'
+#' TENxGeoJSON(geojsonres) |>
+#'   import()
 #' @export
 TENxGeoJSON <- function(resource) {
     if (!is(resource, "TENxFile"))
