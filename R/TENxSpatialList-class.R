@@ -61,7 +61,8 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 
 .validTENxSpatialList <- function(object) {
     c(
-        # .check_file_pattern(object, "tissue_positions.*"),
+        if (!is.null(object@tissuePos))
+            .check_file_pattern(object, "tissue_positions.*"),
         .check_file_pattern(object, "scalefactors.*\\.json$"),
         .check_file(object, object@scaleJSON)
     )
@@ -166,6 +167,9 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
         ffcolData <- import(fff)
         if (length(con@binSize))
             ffcolData[["bin_size"]] <- con@binSize
+        ffcolData <- as(ffcolData, "DataFrame")
+        if (length(ffcolData[["barcode"]]))
+            rownames(ffcolData) <- ffcolData[["barcode"]]
         res <- c(res, colData = ffcolData)
     }
     res

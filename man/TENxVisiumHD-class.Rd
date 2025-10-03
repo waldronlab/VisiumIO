@@ -12,6 +12,7 @@ TENxVisiumHD(
   resources,
   spatialResource,
   spacerangerOut,
+  segmented_outputs,
   sample_id = "sample01",
   processing = c("filtered", "raw"),
   format = c("mtx", "h5"),
@@ -154,4 +155,7 @@ TENxVisiumHD(
 ) |>
     import()
 
+}
+\author{
+E. Y. Dong, M. Ramos
 }
