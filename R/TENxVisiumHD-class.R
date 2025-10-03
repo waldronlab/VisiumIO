@@ -155,6 +155,9 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 #' @inheritParams TENxVisium
 #' @inheritParams TENxVisiumList
 #'
+#' @param segmented_outputs `character(1)` The path to the `segmented_outputs`
+#'   directory
+#'
 #' @param bin_size `character(1)` The bin size of the images to import. The
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.

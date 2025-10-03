@@ -38,6 +38,9 @@ the sample directory of \verb{spaceranger count}. The directory must contain the
 \verb{(processing)_feature_bc_matrix} and \code{spatial} sub directories in addition
 to the \code{outs} folder.}
 
+\item{segmented_outputs}{\code{character(1)} The path to the \code{segmented_outputs}
+directory}
+
 \item{sample_id}{\code{character(1)} A single string specifying the sample ID.}
 
 \item{processing}{\code{character(1)} A single string indicating the processing
