@@ -34,3 +34,59 @@ expect_identical(
 expect_identical(
     rownames(rowData(spe)), rowData(spe)[["ID"]]
 )
+
+# test segmented_outputs input --------------------------------------------
+
+library(sf)
+sample_dir <- system.file(
+    "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
+)
+
+tvh <- TENxVisiumHD(
+    segmented_outputs = sample_dir,
+    format = "h5",
+    processing = "filtered",
+    images = "lowres"
+)
+
+expect_true(
+    is(tvh, "TENxVisiumHD")
+)
+
+expect_true(
+    validObject(tvh)
+)
+
+spe <- import(tvh)
+
+expect_true(
+    is(spe, "SpatialExperiment")
+)
+
+expect_identical(
+    colnames(spe), rownames(colData(spe))
+)
+
+expect_identical(
+    colnames(spe), rownames(colData(spe))
+)
+
+
+expect_identical(
+    rownames(rowData(spe)), rowData(spe)[["ID"]]
+)
+
+expect_true(
+    "cellseg" %in% names(metadata(spe))
+)
+
+expect_true(
+    is.data.frame(metadata(spe)$cellseg)
+)
+expect_true(
+    is(metadata(spe)$cellseg, "sf")
+)
+expect_identical(
+    nrow(metadata(spe)$cellseg), ncol(spe)
+)
+
