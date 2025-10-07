@@ -48,8 +48,11 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     sQuote(.FEATURE_BC_MATRIX_FILES), collapse = ", "
 )
 
-.find_file_or_dir <- function(reldir, processing, format, ...) {
-    fdirname <- paste0(processing, "_feature_bc_matrix")
+.find_file_or_dir <- function(
+    reldir, processing, format, type = c("bc", "cell"), ...
+) {
+    type <- match.arg(type)
+    fdirname <- paste0(processing, paste0("_feature_", type, "_matrix"))
     if (identical(format, "h5")) {
         fnamepat <- paste0(processing, "_feature_bc_matrix\\.", format, "$")
         h5file <- list.files(

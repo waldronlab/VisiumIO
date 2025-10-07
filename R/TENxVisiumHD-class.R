@@ -44,6 +44,14 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     spatf
 }
 
+.getCSspatialPath <- function(path) {
+    outputs <- file.path(path, "spatial")
+    stopifnot(
+        "The 'spatial' directory was not found." = dir.exists(outputs)
+    )
+    outputs
+}
+
 .filter_sort_mtx_files <- function(namesvec) {
     files <- .FEATURE_BC_MATRIX_FILES
     names(files) <- files
@@ -100,9 +108,41 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     path
 }
 
+.find_convert_resources_cshd <- function(path, processing, format, ...) {
+    if (!is(path, "TENxFileList")) {
+        segout <- .getCSspatialPath(path) |> dirname()
+        path <-  .find_file_or_dir(segout, processing, format, type = "cell")
+        fdirname <- paste0(processing, "_feature_cell_matrix")
+        fdirpath <- file.path(segout, fdirname)
+        spatialpath <- file.path(segout, "spatial")
+        if (
+            (identical(format, "mtx") && !all(dir.exists(fdirpath))) ||
+                !all(dir.exists(spatialpath))
+        )
+            stop(
+                "The 'spatial' or '", fdirname, "' directory was not found.",
+                "\n  Verify 'segmented_outputs' and 'processing' inputs.",
+                call. = FALSE
+            )
+    } else {
+        path <- .check_filter_mtx(path)
+    }
+    path
+}
+
 .find_convert_spatial_hd <- function(path, bin_size, ...) {
     if (!is(path, "TENxFileList")) {
         path <- .getSpatialPath(path, bin_size)
+    } else {
+        path <- .exclude_mtx_files(path)
+        path <- .exclude_h5_files(path)
+    }
+    TENxSpatialList(path, ...)
+}
+
+.find_convert_spatial_cshd <- function(path, ...) {
+    if (!is(path, "TENxFileList")) {
+        path <- .getCSspatialPath(path)
     } else {
         path <- .exclude_mtx_files(path)
         path <- .exclude_h5_files(path)
@@ -200,6 +240,13 @@ TENxVisiumHD <- function(
     if (!missing(segmented_outputs)) {
         stopifnot(
             dir.exists(segmented_outputs)
+        )
+        resources <- .find_convert_resources_cshd(
+            segmented_outputs, processing, format, ...
+        )
+        spatialResource <- .find_convert_spatial_cshd(
+            path = segmented_outputs, sample_id = sample_id,
+            images = images, jsonFile = jsonFile, tissuePattern = NULL
         )
         geojson <- TENxGeoJSON(
             file.path(segmented_outputs, "cell_segmentations.geojson")
