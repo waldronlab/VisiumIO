@@ -42,6 +42,7 @@ methods to handle spatially resolved transcriptomics data.
 |---------------------|---------------|----------------------|
 | spatial.tar.gz      | TENxSpatialList | DataFrame list *   |
 | .parquet            | TENxSpatialParquet | tibble *        |
+| .geojson            | TENxGeoJSON   | sf object *          |
 
 __Note__. (*) Intermediate format 
 
