@@ -57,8 +57,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/lib/R/site-library
-          key: ${{ env.cache-version}}-${{ runner.os }}-r-${{ matrix.bioc_version }}-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version}}-${{ runner.os }}-r-${{ matrix.bioc_version }}-
+          key: ${{ env.cache-version }}-${{ runner.os }}-r-${{ matrix.bioc_version }}-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-r-${{ matrix.bioc_version }}-
 
       - name: Install GPG
         if: ${{ github.ref == 'refs/heads/devel' && github.event_name != 'pull_request' }}
