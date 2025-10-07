@@ -158,3 +158,67 @@ compareBarcodes <- function(
     bcode_list <- .get_bcode_list(res)
     .compare_list_bcodes(bcode_list)
 }
+
+#' Flip the Y-axis of cell or nucleus segmentations to align with H&E image
+#'
+#' @description This function flips the Y-axis of cell or nucleus segmentations
+#'   stored in an `sf` object to align with the H&E image. The Y-axis flipping
+#'   is necessary because the origin (0,0) in image coordinates is at the
+#'   top-left corner, while in Cartesian coordinates, the origin is at the
+#'   bottom-left corner. The function takes into account the image height and
+#'   scaling factor to accurately flip the Y-coordinates of the segmentations.
+#'
+#' @param sf `sf` an `sf` class object read from a `.geojson` file.
+#'
+#' @param type `character(1)` "POINT" for cell centroid, or "POLYGON" for cell
+#'   segmentation mask. Default is "POINT".
+#'
+#' @param img_height `numeric(1)` The total length along the Y axis of the
+#'   image. Obtained by reading in `hires` or `lowre`s `.png` under `/spatial`
+#'   folder with `magick::image_read()`.
+#'
+#' @param scalef `numeric(1)` The scaling factor from a
+#'   `/spatial/scalefactors_json.json` file
+#'
+#' @returns an `sf` object with Y-axis of the points or polygons flipped
+#'
+#' @importFrom BiocBaseUtils checkInstalled isScalarNumber
+#' @author Estella YiXing Dong
+#'
+#' @examples
+#' geojson_file <- system.file(
+#'     file.path("extdata", "segmented_outputs", "cell_segmentations.geojson"),
+#'     mustWork = TRUE, package = "VisiumIO"
+#' )
+#' geo_data <- sf::st_read(geojson_file, quiet = TRUE)
+#' st_invert_y(
+#'     sf = geo_data, type = "POLYGON", img_height = 3886, scalef = 0.079
+#' )
+#' @export
+st_invert_y <- function(sf, type = c("POINT", "POLYGON"), img_height, scalef) {
+    checkInstalled("sf")
+    type <- match.arg(type)
+    stopifnot(
+        isScalarNumber(img_height), isScalarNumber(scalef)
+    )
+    res <- sf::st_sfc(
+            lapply(
+                sf::st_geometry(sf),
+                function(geom) {
+                    coords <- sf::st_coordinates(geom)
+                    coords[, 2] <- img_height / scalef - coords[, 2]
+                    if (identical(type, "POINT"))
+                        sf::st_point(coords)
+                    else if  (identical(type, "POLYGON"))
+                        sf::st_polygon(
+                            list(
+                                matrix(coords[, 1:2], ncol = 2)
+                            )
+                        )
+                }
+            ),
+            crs = sf::st_crs(sf)
+        )
+    sf::st_geometry(sf) <- res
+    sf
+}
