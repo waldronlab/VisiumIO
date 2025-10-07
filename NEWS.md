@@ -1,3 +1,13 @@
+## Changes in version 1.6.0
+
+### New features
+
+* Added support for `TENxGeoJSON` format to import cell segmentation data
+  from the `segmented_outputs` folder. This allows working with segmentation
+  data as `sf` objects within `SpatialExperiment`
+* `tissuePos` and `binSize` can be optional parameters for `TENxVisiumHD`
+  imports, esp. for `segmented_outputs` inputs 
+
 ## Changes in version 1.4.0
 
 ### New features
