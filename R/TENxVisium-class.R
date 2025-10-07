@@ -54,7 +54,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     type <- match.arg(type)
     fdirname <- paste0(processing, paste0("_feature_", type, "_matrix"))
     if (identical(format, "h5")) {
-        fnamepat <- paste0(processing, "_feature_bc_matrix\\.", format, "$")
+        fnamepat <- paste0(
+            processing, "_feature_", type, "_matrix\\.", format, "$"
+        )
         h5file <- list.files(
             reldir, pattern = fnamepat, recursive = FALSE, full.names = TRUE
         )
