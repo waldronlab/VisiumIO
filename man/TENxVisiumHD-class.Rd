@@ -158,6 +158,15 @@ TENxVisiumHD(
 ) |>
     import()
 
+seg_outs <- system.file(
+    "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
+)
+TENxVisiumHD(
+    segmented_outputs = seg_outs,
+    format = "h5",
+    images = "lowres"
+) |>
+    import()
 }
 \author{
 E. Y. Dong, M. Ramos

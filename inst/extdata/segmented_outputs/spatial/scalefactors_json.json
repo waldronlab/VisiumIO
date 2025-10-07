@@ -1,0 +1,7 @@
+{
+    "microns_per_pixel": 0.2737061758251425,
+    "tissue_lowres_scalef": 0.0071874363,
+    "fiducial_diameter_fullres": 1205.6724661222877,
+    "tissue_hires_scalef": 0.071874365,
+    "regist_target_img_scalef": 0.071874365
+}

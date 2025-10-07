@@ -314,6 +314,16 @@ TENxVisiumHD <- function(
 #'
 #' @author E. Y. Dong, M. Ramos
 #'
+#' @examples
+#' seg_outs <- system.file(
+#'     "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
+#' )
+#' TENxVisiumHD(
+#'     segmented_outputs = seg_outs,
+#'     format = "h5",
+#'     images = "lowres"
+#' ) |>
+#'     import()
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     if (!con@cellseg)
