@@ -309,7 +309,46 @@ TENxVisiumHD <- function(
 #'
 #' @inheritParams TENxVisiumList
 #'
+#' @author E. Y. Dong, M. Ramos
+#'
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
-    methods::callNextMethod()
+    if (!con@cellseg)
+        return(
+            methods::callNextMethod()
+        )
+    checkInstalled("sf")
+    geo_data <- import(con@geojson)
+    centroids <- sf::st_centroid(geo_data)
+    centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
+
+    sce <- import(con@resources)
+    slist <- import(con@spatialList)
+    img <- slist[["imgData"]]
+    colnames(sce) <- strsplit(colnames(sce), "_|-") |>
+        vapply(`[`, character(1), 2L) |>
+        sub("0*([1-9]+)", "\\1", x = _)
+
+    common_cells <- intersect(centroids[["cell_id"]], colnames(sce))
+    centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
+    sce <- sce[, common_cells]
+
+    coords <- sf::st_coordinates(centroids)
+    colnames(coords) <- con@coordNames
+
+    SpatialExperiment(
+        assays = list(counts = assay(sce)),
+        rowData = rowData(sce),
+        mainExpName = mainExpName(sce),
+        altExps = altExps(sce),
+        sample_id = con@sampleId,
+        colData = cbind(colData(sce), coords),
+        spatialCoordsNames = con@coordNames,
+        imgData = img,
+        metadata = list(
+            resources = metadata(sce),
+            spatialList = metadata(con@spatialList)
+        )
+    )
 })
+
