@@ -338,6 +338,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
 
     coords <- sf::st_coordinates(centroids)
     colnames(coords) <- con@coordNames
+    rownames(coords) <- centroids[["cell_id"]]
 
     SpatialExperiment(
         assays = list(counts = assay(sce)),
