@@ -1,3 +1,5 @@
+setClassUnion("character_OR_NULL", c("character", "NULL"))
+
 #' @docType class
 #'
 #' @title A class to represent and import spatial Visium data
@@ -36,7 +38,7 @@
     slots = c(
         images = "character",
         scaleJSON = "character",
-        tissuePos = "character",
+        tissuePos = "character_OR_NULL",
         sampleId = "character",
         binSize = "character"
     )
@@ -59,7 +61,7 @@
 
 .validTENxSpatialList <- function(object) {
     c(
-        .check_file_pattern(object, "tissue_positions.*"),
+        # .check_file_pattern(object, "tissue_positions.*"),
         .check_file_pattern(object, "scalefactors.*\\.json$"),
         .check_file(object, object@scaleJSON)
     )
@@ -110,9 +112,14 @@ TENxSpatialList <- function(
         resources <- TENxFileList(resources, ...)
     if (resources@compressed)
         resources <- decompress(con = resources)
-    tissuePos <- grep(tissuePattern, names(resources), value = TRUE)
-    if (!length(tissuePos))
-        stop("No tissue positions file found with pattern: ", tissuePattern)
+    tissuePos <- tissuePattern
+    if (!is.null(tissuePattern)) {
+        tissuePos <- grep(tissuePattern, names(resources), value = TRUE)
+        if (!length(tissuePos))
+            stop(
+                "No tissue positions file found with pattern: ", tissuePattern
+            )
+    }
 
     if (missing(bin_size) && any(grepl("square_\\d{3}", path(resources)))) {
         bin_size <- unique(
@@ -146,19 +153,22 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     DFs <- lapply(con@images, function(image) {
         .getImgRow(con = con, sampleId = sampid, image = image, scaleFx = sfs)
     })
-    fff <- FileForFormat(
-        path(con)[con@tissuePos],
-        prefix = "TENxSpatial", suffix = NULL
-    )
-    ffcolData <- import(fff)
-    if (length(con@binSize))
-        ffcolData[["bin_size"]] <- con@binSize
-    list(
+    res <- list(
         imgData = DataFrame(
             do.call(rbind, DFs)
-        ),
-        colData = ffcolData
+        )
     )
+    if (!is.null(con@tissuePos)) {
+        fff <- FileForFormat(
+            path(con)[con@tissuePos],
+            prefix = "TENxSpatial", suffix = NULL
+        )
+        ffcolData <- import(fff)
+        if (length(con@binSize))
+            ffcolData[["bin_size"]] <- con@binSize
+        res <- c(res, colData = ffcolData)
+    }
+    res
 })
 
 .getImgRow <- function(con, sampleId, image, scaleFx) {
