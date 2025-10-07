@@ -1,3 +1,5 @@
+setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
+
 #' @include TENxVisiumList-class.R
 
 #' @docType class
@@ -20,7 +22,14 @@
 #'   object
 #'
 #' @exportClass TENxVisiumHD
-.TENxVisiumHD <- setClass(Class = "TENxVisiumHD", contains = "TENxVisium")
+.TENxVisiumHD <- setClass(
+    Class = "TENxVisiumHD",
+    contains = "TENxVisium",
+    slots = c(
+        cellseg = "logical",
+        geojson = "TENxGeoJSON_OR_NULL"
+    )
+)
 
 .getSpatialPath <- function(path, bin_size) {
     outputs <- file.path(path, "binned_outputs")
@@ -170,6 +179,7 @@ TENxVisiumHD <- function(
     resources,
     spatialResource,
     spacerangerOut,
+    segmented_outputs,
     sample_id = "sample01",
     processing = c("filtered", "raw"),
     format = c("mtx", "h5"),
@@ -184,8 +194,18 @@ TENxVisiumHD <- function(
     processing <- match.arg(processing)
     bin_size <- match.arg(bin_size)
     format <- match.arg(format)
+    cellseg <- FALSE
+    geojson <- NULL
 
-    if (!missing(spacerangerOut)) {
+    if (!missing(segmented_outputs)) {
+        stopifnot(
+            dir.exists(segmented_outputs)
+        )
+        geojson <- TENxGeoJSON(
+            file.path(segmented_outputs, "cell_segmentations.geojson")
+        )
+        cellseg <- TRUE
+    } else if (!missing(spacerangerOut)) {
         if (isScalarCharacter(spacerangerOut))
             stopifnot(
                 dir.exists(spacerangerOut)
@@ -233,7 +253,7 @@ TENxVisiumHD <- function(
         ...
     )
 
-    .TENxVisiumHD(txv)
+    .TENxVisiumHD(txv, cellseg = cellseg, geojson = geojson)
 }
 
 # import TENxVisiumHD method ----------------------------------------------
