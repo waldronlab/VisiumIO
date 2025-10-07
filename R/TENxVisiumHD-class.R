@@ -328,13 +328,13 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     sce <- import(con@resources)
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]
-    colnames(sce) <- strsplit(colnames(sce), "_|-") |>
+    sce_cellids <-  strsplit(colnames(sce), "_|-") |>
         vapply(`[`, character(1), 2L) |>
         sub("0*([1-9]+)", "\\1", x = _)
 
-    common_cells <- intersect(centroids[["cell_id"]], colnames(sce))
+    common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
     centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
-    sce <- sce[, common_cells]
+    sce <- sce[, match(common_cells, sce_cellids)]
 
     coords <- sf::st_coordinates(centroids)
     colnames(coords) <- con@coordNames
