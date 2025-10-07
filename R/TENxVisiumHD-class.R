@@ -350,8 +350,8 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         imgData = img,
         metadata = list(
             resources = metadata(sce),
-            spatialList = metadata(con@spatialList)
+            spatialList = metadata(con@spatialList),
+            cellseg = geo_data
         )
     )
 })
-
