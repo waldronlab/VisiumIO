@@ -25,7 +25,7 @@
     } else if (file.exists(path) && isScalarCharacter(path)) {
         if (identical(tools::file_ext(path), "gz"))
             path <- decompress(con = TENxFileList(path, ...))
-        path <- .find_convert_resources(path, process, format, ...)
+        path <- .find_convert_resources(path, process, format)
     } else {
         stop("The path is not a 'spacerangerOut' directory or an HDF5 file.")
     }

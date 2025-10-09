@@ -208,7 +208,7 @@ TENxVisium <- function(
                 dir.exists(spacerangerOut)
             )
         resources <-
-            .find_convert_resources(spacerangerOut, processing, format, ...)
+            .find_convert_resources(spacerangerOut, processing, format)
         spatialResource <- .find_convert_spatial(
             path = spacerangerOut, sample_id = sample_id, images = images,
             jsonFile = jsonFile, tissuePattern = tissuePattern
