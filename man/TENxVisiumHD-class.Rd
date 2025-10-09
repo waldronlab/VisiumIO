@@ -34,9 +34,9 @@ file path to the tarball containing the matrix / assay data resources.}
 object or a file path to the tarball containing the spatial data.}
 
 \item{spacerangerOut}{\code{character(1)} A single string specifying the path to
-the sample directory of \verb{spaceranger count}. The directory must contain the
-\verb{(processing)_feature_bc_matrix} and \code{spatial} sub directories in addition
-to the \code{outs} folder.}
+the directory where the output of \verb{spaceranger count} is located; typically
+(but not necessarily), this is the \code{outs} directory. The directory must
+contain the \verb{(processing)_feature_bc_matrix} and \code{spatial} sub directories.}
 
 \item{segmented_outputs}{\code{character(1)} The path to the \code{segmented_outputs}
 directory}

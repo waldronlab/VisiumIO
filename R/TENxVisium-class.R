@@ -106,9 +106,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'   object or a file path to the tarball containing the spatial data.
 #'
 #' @param spacerangerOut `character(1)` A single string specifying the path to
-#'   the sample directory of `spaceranger count`. The directory must contain the
-#'   `(processing)_feature_bc_matrix` and `spatial` sub directories in addition
-#'   to the `outs` folder.
+#'   the directory where the output of `spaceranger count` is located; typically
+#'   (but not necessarily), this is the `outs` directory. The directory must
+#'   contain the `(processing)_feature_bc_matrix` and `spatial` sub directories.
 #'
 #' @param sample_id `character(1)` A single string specifying the sample ID.
 #'
