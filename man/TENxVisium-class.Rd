@@ -112,21 +112,21 @@ of the columns in the spatial data containing the spatial coordinates.}
 
 \examples{
 
-sample_dir <- system.file(
-    file.path("extdata", "10xVisium", "section1"),
+outs_dir <- system.file(
+    file.path("extdata", "10xVisium", "section1", "outs"),
     package = "VisiumIO"
 )
 
 ## using spacerangerOut folder
 tv <- TENxVisium(
-    spacerangerOut = sample_dir, processing = "raw", images = "lowres"
+    spacerangerOut = outs_dir, processing = "raw", images = "lowres"
 )
 
 import(tv)
 
 ## with TENxFileList spacerangerOut input
 tvfl <- TENxVisium(
-    spacerangerOut = TENxFileList(sample_dir),
+    spacerangerOut = TENxFileList(outs_dir),
     format = "mtx",
     processing = "raw",
     images = "lowres"
@@ -141,7 +141,7 @@ import(tvfl) |>
 
 ## importing h5 format
 tvfl <- TENxVisium(
-    spacerangerOut = sample_dir,
+    spacerangerOut = outs_dir,
     format = "h5",
     processing = "raw",
     images = "lowres"
@@ -149,7 +149,7 @@ tvfl <- TENxVisium(
 
 import(tvfl)
 
-rffolder <- file.path(sample_dir, "outs", "raw_feature_bc_matrix")
+rffolder <- file.path(outs_dir, "raw_feature_bc_matrix")
 ## using resources and spatialResource inputs
 tvfl <- TENxVisium(
     resources = rffolder,

@@ -136,21 +136,21 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' @examples
 #'
-#' sample_dir <- system.file(
-#'     file.path("extdata", "10xVisium", "section1"),
+#' outs_dir <- system.file(
+#'     file.path("extdata", "10xVisium", "section1", "outs"),
 #'     package = "VisiumIO"
 #' )
 #'
 #' ## using spacerangerOut folder
 #' tv <- TENxVisium(
-#'     spacerangerOut = sample_dir, processing = "raw", images = "lowres"
+#'     spacerangerOut = outs_dir, processing = "raw", images = "lowres"
 #' )
 #'
 #' import(tv)
 #'
 #' ## with TENxFileList spacerangerOut input
 #' tvfl <- TENxVisium(
-#'     spacerangerOut = TENxFileList(sample_dir),
+#'     spacerangerOut = TENxFileList(outs_dir),
 #'     format = "mtx",
 #'     processing = "raw",
 #'     images = "lowres"
@@ -165,7 +165,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' ## importing h5 format
 #' tvfl <- TENxVisium(
-#'     spacerangerOut = sample_dir,
+#'     spacerangerOut = outs_dir,
 #'     format = "h5",
 #'     processing = "raw",
 #'     images = "lowres"
@@ -173,7 +173,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' import(tvfl)
 #'
-#' rffolder <- file.path(sample_dir, "outs", "raw_feature_bc_matrix")
+#' rffolder <- file.path(outs_dir, "raw_feature_bc_matrix")
 #' ## using resources and spatialResource inputs
 #' tvfl <- TENxVisium(
 #'     resources = rffolder,
