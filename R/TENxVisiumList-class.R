@@ -75,15 +75,23 @@ TENxVisiumList <- function(
     processing <- match.arg(processing)
     format <- match.arg(format)
 
+    samp_outs <- file.path(sampleFolders, "outs")
+    if (all(dir.exists(samp_outs)))
+        sampleFolders <- samp_outs
+
     resources <- lapply(
         sampleFolders,
         .find_convert_resources,
         processing = processing,
         format = format,
+        bin_size = NULL,
+        type = "bc",
         ...
     )
 
-    if (missing(sample_ids))
+    if (missing(sample_ids) && all(endsWith(sampleFolders, "outs")))
+        sample_ids <- basename(dirname(sampleFolders))
+    else if (missing(sample_ids))
         sample_ids <- basename(sampleFolders)
 
     spatialResources <- Map(
@@ -91,6 +99,8 @@ TENxVisiumList <- function(
         path = sampleFolders,
         sample_id = sample_ids,
         MoreArgs = list(
+            bin_size = NULL,
+            type = "bc",
             images = images,
             jsonFile = jsonFile,
             tissuePattern = tissuePattern

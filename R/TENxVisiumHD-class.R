@@ -33,24 +33,24 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 
 .getSpatialPath <- function(path, bin_size = NULL, type = c("bc", "cell")) {
     type <- match.arg(type)
+    squaref <- ""
 
     if (identical(type, "bc")) {
-        if (is.null(bin_size))
-            stop(
-                "<internal> 'bin_size' is required when type is 'bc'",
-                call. = FALSE
-            )
-
-        outputs <- file.path(path, "binned_outputs")
-
-        if (!dir.exists(outputs))
-            stop("The 'binned_outputs' directory was not found.")
-
-        squaref <- paste0("square_", bin_size, "um")
-        spatial_out <- file.path(outputs, squaref, "spatial")
+        if (is.null(bin_size)) {
+            out_folder <- "'outs'"
+        } else {
+            path <- file.path(path, "binned_outputs")
+            out_folder <- "'outs'"
+            squaref <- paste0("square_", bin_size, "um")
+        }
     } else {
-        spatial_out <- file.path(path, "spatial")
+        out_folder <- "'segmented_outputs'"
     }
+
+    if (!dir.exists(path))
+        stop("The ", out_folder, " directory was not found.")
+
+    spatial_out <- file.path(path, squaref, "spatial")
 
     if (!dir.exists(spatial_out))
         stop("The 'spatial' directory was not found.")
