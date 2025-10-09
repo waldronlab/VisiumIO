@@ -31,25 +31,31 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     )
 )
 
-.getSpatialPath <- function(path, bin_size) {
-    outputs <- file.path(path, "binned_outputs")
-    stopifnot(
-        "The 'binned_outputs' directory was not found." = dir.exists(outputs)
-    )
-    squaref <- paste0("square_", bin_size, "um")
-    spatf <- file.path(outputs, squaref, "spatial")
-    stopifnot(
-        "The 'spatial' directory was not found." = all(dir.exists(spatf))
-    )
-    spatf
-}
+.getSpatialPath <- function(path, bin_size = NULL, type = c("bc", "cell")) {
+    type <- match.arg(type)
 
-.getCSspatialPath <- function(path) {
-    outputs <- file.path(path, "spatial")
-    stopifnot(
-        "The 'spatial' directory was not found." = dir.exists(outputs)
-    )
-    outputs
+    if (identical(type, "bc")) {
+        if (is.null(bin_size))
+            stop(
+                "<internal> 'bin_size' is required when type is 'bc'",
+                call. = FALSE
+            )
+
+        outputs <- file.path(path, "binned_outputs")
+
+        if (!dir.exists(outputs))
+            stop("The 'binned_outputs' directory was not found.")
+
+        squaref <- paste0("square_", bin_size, "um")
+        spatial_out <- file.path(outputs, squaref, "spatial")
+    } else {
+        spatial_out <- file.path(path, "spatial")
+    }
+
+    if (!dir.exists(spatial_out))
+        stop("The 'spatial' directory was not found.")
+
+    spatial_out
 }
 
 .filter_sort_mtx_files <- function(namesvec) {
@@ -84,65 +90,59 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     filelist[afiles]
 }
 
-.find_convert_resources_hd <-
-    function(path, processing, format, bin_size, ...)
-{
+.find_convert_resources <- function(
+    path,
+    processing,
+    format,
+    bin_size = NULL,
+    type = c("bc", "cell")
+) {
+    type <- match.arg(type)
+
     if (!is(path, "TENxFileList")) {
-        squaref <- .getSpatialPath(path, bin_size) |> dirname()
-        path <-  .find_file_or_dir(squaref, processing, format)
-        fdirname <- paste0(processing, "_feature_bc_matrix")
+        squaref <-
+            .getSpatialPath(path = path, bin_size = bin_size, type = type) |>
+                dirname()
+
+        path <- .find_file_or_dir(
+            reldir = squaref,
+            processing = processing,
+            format = format,
+            type = type
+        )
+
+        fdirname <- paste0(processing, "_feature_", type, "_matrix")
         fdirpath <- file.path(squaref, fdirname)
         spatialpath <- file.path(squaref, "spatial")
+
         if (
             (identical(format, "mtx") && !all(dir.exists(fdirpath))) ||
-                !all(dir.exists(spatialpath))
-        )
+            !all(dir.exists(spatialpath))
+        ) {
+            input_arg <- if (identical(type, "bc"))
+                "'spacerangerOut'"
+            else
+                "'segmented_outputs'"
+
             stop(
                 "The 'spatial' or '", fdirname, "' directory was not found.",
-                "\n  Verify 'spacerangerOut' and 'processing' inputs.",
+                "\n  Verify ", input_arg, " and 'processing' inputs.",
                 call. = FALSE
             )
+        }
     } else {
-        path <- .check_filter_mtx(path)
+        if (identical(format, "h5"))
+            path <- .filter_h5_files(path, processing, format, type)
+
     }
+    if (identical(format, "mtx"))
+        path <- .check_filter_mtx(path)
     path
 }
 
-.find_convert_resources_cshd <- function(path, processing, format, ...) {
+.find_convert_spatial <- function(path, bin_size, type, ...) {
     if (!is(path, "TENxFileList")) {
-        segout <- .getCSspatialPath(path) |> dirname()
-        path <-  .find_file_or_dir(segout, processing, format, type = "cell")
-        fdirname <- paste0(processing, "_feature_cell_matrix")
-        fdirpath <- file.path(segout, fdirname)
-        spatialpath <- file.path(segout, "spatial")
-        if (
-            (identical(format, "mtx") && !all(dir.exists(fdirpath))) ||
-                !all(dir.exists(spatialpath))
-        )
-            stop(
-                "The 'spatial' or '", fdirname, "' directory was not found.",
-                "\n  Verify 'segmented_outputs' and 'processing' inputs.",
-                call. = FALSE
-            )
-    } else {
-        path <- .check_filter_mtx(path)
-    }
-    path
-}
-
-.find_convert_spatial_hd <- function(path, bin_size, ...) {
-    if (!is(path, "TENxFileList")) {
-        path <- .getSpatialPath(path, bin_size)
-    } else {
-        path <- .exclude_mtx_files(path)
-        path <- .exclude_h5_files(path)
-    }
-    TENxSpatialList(path, ...)
-}
-
-.find_convert_spatial_cshd <- function(path, ...) {
-    if (!is(path, "TENxFileList")) {
-        path <- .getCSspatialPath(path)
+        path <- .getSpatialPath(path = path, bin_size = bin_size, type = type)
     } else {
         path <- .exclude_mtx_files(path)
         path <- .exclude_h5_files(path)
@@ -240,34 +240,7 @@ TENxVisiumHD <- function(
     cellseg <- FALSE
     geojson <- NULL
 
-    if (!missing(segmented_outputs)) {
-        stopifnot(
-            dir.exists(segmented_outputs)
-        )
-        resources <- .find_convert_resources_cshd(
-            segmented_outputs, processing, format, ...
-        )
-        spatialResource <- .find_convert_spatial_cshd(
-            path = segmented_outputs, sample_id = sample_id,
-            images = images, jsonFile = jsonFile, tissuePattern = NULL
-        )
-        geojson <- TENxGeoJSON(
-            file.path(segmented_outputs, "cell_segmentations.geojson")
-        )
-        cellseg <- TRUE
-    } else if (!missing(spacerangerOut)) {
-        if (isScalarCharacter(spacerangerOut))
-            stopifnot(
-                dir.exists(spacerangerOut)
-            )
-        resources <- .find_convert_resources_hd(
-            spacerangerOut, processing, format, bin_size, ...
-        )
-        spatialResource <- .find_convert_spatial_hd(
-            path = spacerangerOut, bin_size = bin_size, sample_id = sample_id,
-            images = images, jsonFile = jsonFile, tissuePattern = tissuePattern
-        )
-    } else {
+    if (!missing(resources) && !missing(spatialResource)) {
         stopifnot(
             (isScalarCharacter(resources) && file.exists(resources)) ||
                 is(resources, "TENxFileList_OR_TENxH5"),
@@ -282,12 +255,52 @@ TENxVisiumHD <- function(
             resources <- TENxH5(resources, ranges = NA_character_)
         else if (is.character(resources))
             resources <- TENxFileList(resources, ...)
+
         if (!is(spatialResource, "TENxSpatialList"))
             spatialResource <- TENxSpatialList(
-                resources = spatialResource, sample_id = sample_id,
-                images = images, jsonFile = jsonFile,
+                resources = spatialResource,
+                sample_id = sample_id,
+                images = images,
+                jsonFile = jsonFile,
                 tissuePattern = tissuePattern
             )
+    } else {
+        if (!missing(segmented_outputs)) {
+            stopifnot(
+                isScalarCharacter(segmented_outputs),
+                dir.exists(segmented_outputs)
+            )
+            tissuePattern <- bin_size <- NULL
+            geojson <- TENxGeoJSON(
+                file.path(segmented_outputs, "cell_segmentations.geojson")
+            )
+            data_folder <- segmented_outputs
+            cellseg <- TRUE
+            type <- "cell"
+        } else if (!missing(spacerangerOut)) {
+            stopifnot(
+                isScalarCharacter(spacerangerOut),
+                dir.exists(spacerangerOut)
+            )
+            data_folder <- spacerangerOut
+            type <- "bc"
+        }
+        resources <- .find_convert_resources(
+            path = data_folder,
+            processing = processing,
+            format = format,
+            bin_size = bin_size,
+            type = type
+        )
+        spatialResource <- .find_convert_spatial(
+            path = data_folder,
+            bin_size = bin_size,
+            type = type,
+            sample_id = sample_id,
+            images = images,
+            jsonFile = jsonFile,
+            tissuePattern = tissuePattern
+        )
     }
 
     txv <- TENxVisium(

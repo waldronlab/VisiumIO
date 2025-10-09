@@ -89,43 +89,12 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     path
 }
 
-.filter_h5_files <- function(path, processing, format) {
-    fname <- paste0(processing, "_feature_bc_matrix", ".", format)
+.filter_h5_files <- function(path, processing, format, type) {
+    fname <- paste0(processing, "_feature_", type, "_matrix", ".", format)
     ish5file <- endsWith(names(path), fname)
     if (!any(ish5file))
         stop("The '", fname, "' file was not found.")
     path(path[ish5file])
-}
-
-.find_convert_resources <- function(path, processing, format, ...) {
-    if (!is(path, "TENxFileList")) {
-        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-        stopifnot(
-            "The 'outs' directory was not found." = endsWith(odir, "outs")
-        )
-        path <- .find_file_or_dir(odir, processing, format, ...)
-    } else {
-        if (identical(format, "h5")) {
-            path <- .filter_h5_files(path, processing, format)
-        }
-    }
-    if (identical(format, "mtx"))
-        path <- .check_filter_mtx(path)
-    path
-}
-
-.find_convert_spatial <- function(path, ...) {
-    if (!is(path, "TENxFileList")) {
-        odir <- list.dirs(path, recursive = FALSE, full.names = TRUE)
-        if (endsWith(odir, "outs"))
-            path <- file.path(odir, "spatial")
-        else
-            stop("The 'outs' directory was not found")
-    } else {
-        path <- .exclude_mtx_files(path)
-        path <- .exclude_h5_files(path)
-    }
-    TENxSpatialList(path, ...)
 }
 
 #' @rdname TENxVisium-class
