@@ -217,6 +217,15 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 #' ) |>
 #'     import()
 #'
+#' seg_outs <- system.file(
+#'     "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
+#' )
+#' TENxVisiumHD(
+#'     segmented_outputs = seg_outs,
+#'     format = "h5",
+#'     images = "lowres"
+#' ) |>
+#'     import()
 #' @export
 TENxVisiumHD <- function(
     resources,
@@ -327,16 +336,6 @@ TENxVisiumHD <- function(
 #'
 #' @author E. Y. Dong, M. Ramos
 #'
-#' @examples
-#' seg_outs <- system.file(
-#'     "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
-#' )
-#' TENxVisiumHD(
-#'     segmented_outputs = seg_outs,
-#'     format = "h5",
-#'     images = "lowres"
-#' ) |>
-#'     import()
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     if (!con@cellseg)
