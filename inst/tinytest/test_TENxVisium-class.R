@@ -1,10 +1,10 @@
-sample_dir <- system.file(
-    file.path("extdata", "10xVisium", "section1"),
+outs_dir <- system.file(
+    file.path("extdata", "10xVisium", "section1", "outs"),
     package = "VisiumIO"
 )
 
 tv <- TENxVisium(
-    spacerangerOut = sample_dir, processing = "raw", images = "lowres"
+    spacerangerOut = outs_dir, processing = "raw", images = "lowres"
 )
 
 expect_true(
@@ -16,7 +16,7 @@ expect_true(
 
 expect_error(
     TENxVisium(
-        spacerangerOut = dirname(sample_dir),
+        spacerangerOut = dirname(outs_dir),
         processing = "raw",
         images = "hires"
     )
@@ -24,10 +24,10 @@ expect_error(
 
 tv <- TENxVisium(
     resources = TENxFileList(
-        file.path(sample_dir, "outs/raw_feature_bc_matrix")
+        file.path(outs_dir, "raw_feature_bc_matrix")
     ),
     spatialResource = TENxSpatialList(
-        resources = file.path(sample_dir, "outs/spatial"),
+        resources = file.path(outs_dir, "spatial"),
         sample_id = "sample01",
         images = "lowres"
     ),
@@ -43,7 +43,7 @@ expect_true(
 )
 
 tv <- TENxVisium(
-    spacerangerOut = TENxFileList(sample_dir),
+    spacerangerOut = TENxFileList(outs_dir),
     processing = "raw",
     images = "lowres"
 )
@@ -56,7 +56,7 @@ expect_true(
 
 expect_error(
     TENxVisium(
-        spacerangerOut = TENxFileList(file.path(sample_dir, "outs/spatial")),
+        spacerangerOut = TENxFileList(file.path(outs_dir, "spatial")),
         processing = "raw",
         images = "lowres",
         sample_id = "sample01"
@@ -64,8 +64,8 @@ expect_error(
 )
 
 tv <- TENxVisium(
-    resources = file.path(sample_dir, "outs/raw_feature_bc_matrix"),
-    spatialResource = file.path(sample_dir, "outs/spatial"),
+    resources = file.path(outs_dir, "raw_feature_bc_matrix"),
+    spatialResource = file.path(outs_dir, "spatial"),
     images = "lowres",
     sample_id = "sample01"
 )
@@ -83,8 +83,8 @@ expect_identical(
 
 expect_error(
     VisiumIO:::.TENxVisium(
-        resources = file.path(sample_dir, "outs/raw_feature_bc_matrix"),
-        spatialList =  TENxSpatialList(file.path(sample_dir, "outs/spatial")),
+        resources = file.path(outs_dir, "raw_feature_bc_matrix"),
+        spatialList =  TENxSpatialList(file.path(outs_dir, "spatial")),
         coordNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
         sampleId = "sample01"
     )
@@ -93,10 +93,11 @@ expect_error(
 expect_error(
     VisiumIO:::.TENxVisium(
         resources = TENxFileList(
-            file.path(sample_dir, "outs/raw_feature_bc_matrix")
+            file.path(outs_dir, "raw_feature_bc_matrix")
         ),
-        spatialList =  file.path(sample_dir, "outs/spatial"),
+        spatialList =  file.path(outs_dir, "spatial"),
         coordNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
         sampleId = "sample01"
     )
 )
+
