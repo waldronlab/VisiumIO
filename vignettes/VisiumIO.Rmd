@@ -103,20 +103,23 @@ shown below:
 
 ### Creating a TENxVisium instance
 
-Using the example data in `SpatialExperiment`, we can load the `section1`
+Using the example data from `SpatialExperiment`, we can load the `section1`
 sample using `TENxVisium`.
 
 ```{r}
-sample_dir <- system.file(
-    file.path("extdata", "10xVisium", "section1"),
+outs_folder <- system.file(
+    file.path("extdata", "10xVisium", "section1", "outs"),
     package = "VisiumIO"
 )
 
 vis <- TENxVisium(
-    spacerangerOut = sample_dir, processing = "raw", images = "lowres"
+    spacerangerOut = outs_folder, processing = "raw", images = "lowres"
 )
 vis
 ```
+
+Note that the `spacerangerOut` input corresponds directly to the `outs` folder
+from the `spaceranger` output. 
 
 The show method of the `TENxVisium` class displays the object's metadata.
 
