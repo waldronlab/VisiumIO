@@ -2,11 +2,19 @@
 
 ### New features
 
+* Added the `st_invert_y` helper function (from @estellad, #15) to invert
+  y-coordinates in `sf` objects.
 * Added support for `TENxGeoJSON` format to import cell segmentation data
   from the `segmented_outputs` folder. This allows working with segmentation
   data as `sf` objects within `SpatialExperiment`
 * `tissuePos` and `binSize` can be optional parameters for `TENxVisiumHD`
   imports, esp. for `segmented_outputs` inputs 
+  
+## Bug fixes and minor improvements
+
+* Folder inputs to arguments such as `spacerangerOut` are not required to
+contain an `outs/` directory. These inputs should be used directly, if
+available.
 
 ## Changes in version 1.4.0
 
