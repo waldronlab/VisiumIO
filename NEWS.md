@@ -1,4 +1,4 @@
-## Changes in version 1.6.1
+## Changes in version 1.6.2
 
 ### New features
 
@@ -12,6 +12,8 @@
   
 ## Bug fixes and minor improvements
 
+* Fixed issue when using `sample_id` parameter in `TENxVisiumHD`
+  (@michaelplynch, #17)
 * Allow `spacerangerOut` inputs in `TENxVisium` to have an `outs` folder and optionally
   check for the `spatial` subfolder within it (@estellad, #18).
 * Folder inputs to arguments such as `spacerangerOut` are not required to
