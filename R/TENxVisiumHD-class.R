@@ -310,7 +310,7 @@ TENxVisiumHD <- function(
     txv <- TENxVisium(
         resources = resources,
         spatialResource = spatialResource,
-        sampleId = sample_id,
+        sample_id = sample_id,
         processing = processing,
         format = format,
         images = images,
