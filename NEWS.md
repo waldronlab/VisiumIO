@@ -1,3 +1,10 @@
+## Changes in version 1.8.0
+
+## Bug fixes and minor improvements
+
+* Allow `spacerangerOut` inputs in `TENxVisium` to have an `outs` folder and optionally
+  check for the `spatial` subfolder within it (@estellad, #18).
+
 ## Changes in version 1.6.0
 
 ### New features
