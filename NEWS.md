@@ -2,6 +2,8 @@
 
 ## Bug fixes and minor improvements
 
+* Fixed issue when using `sample_id` parameter in `TENxVisiumHD`
+  (@michaelplynch, #17)
 * Allow `spacerangerOut` inputs in `TENxVisium` to have an `outs` folder and optionally
   check for the `spatial` subfolder within it (@estellad, #18).
 
