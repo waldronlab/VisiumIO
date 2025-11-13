@@ -36,19 +36,14 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     squaref <- ""
 
     if (identical(type, "bc")) {
-        if (is.null(bin_size)) {
-            out_folder <- "'outs'"
-        } else {
+        out_path <- file.path(path, "outs")
+        if (dir.exists(out_path))
+            squaref <- "outs"
+        if (!is.null(bin_size)) {
             path <- file.path(path, "binned_outputs")
-            out_folder <- "'outs'"
             squaref <- paste0("square_", bin_size, "um")
         }
-    } else {
-        out_folder <- "'segmented_outputs'"
     }
-
-    if (!dir.exists(path))
-        stop("The ", out_folder, " directory was not found.")
 
     spatial_out <- file.path(path, squaref, "spatial")
 
