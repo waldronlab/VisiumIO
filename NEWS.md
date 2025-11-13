@@ -1,4 +1,4 @@
-## Changes in version 1.6.0
+## Changes in version 1.6.1
 
 ### New features
 
@@ -12,6 +12,8 @@
   
 ## Bug fixes and minor improvements
 
+* Allow `spacerangerOut` inputs in `TENxVisium` to have an `outs` folder and optionally
+  check for the `spatial` subfolder within it (@estellad, #18).
 * Folder inputs to arguments such as `spacerangerOut` are not required to
 contain an `outs/` directory. These inputs should be used directly, if
 available.
