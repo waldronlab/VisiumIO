@@ -1,6 +1,6 @@
 ## Changes in version 1.8.0
 
-## Bug fixes and minor improvements
+### Bug fixes and minor improvements
 
 * Fixed issue when using `sample_id` parameter in `TENxVisiumHD`
   (@michaelplynch, #17)
@@ -17,8 +17,8 @@
   from the `segmented_outputs` folder. This allows working with segmentation
   data as `sf` objects within `SpatialExperiment`
 * `tissuePos` and `binSize` can be optional parameters for `TENxVisiumHD`
-  imports, esp. for `segmented_outputs` inputs 
-  
+  imports, esp. for `segmented_outputs` inputs
+
 ### Bug fixes and minor improvements
 
 * Folder inputs to arguments such as `spacerangerOut` are not required to
@@ -30,7 +30,7 @@ available.
 ### New features
 
 * Added support for CytAssist images (@ZheFrench, #8)
-* Enabled use of alternative readers via `VisiumIO.csvreader` option 
+* Enabled use of alternative readers via `VisiumIO.csvreader` option
 * Included metadata in `SpatialExperiment` outputs
 
 ### Bug fixes and minor improvements
