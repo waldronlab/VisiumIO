@@ -10,7 +10,7 @@
 * `tissuePos` and `binSize` can be optional parameters for `TENxVisiumHD`
   imports, esp. for `segmented_outputs` inputs 
   
-## Bug fixes and minor improvements
+### Bug fixes and minor improvements
 
 * Fixed issue when using `sample_id` parameter in `TENxVisiumHD`
   (@michaelplynch, #17)
@@ -28,7 +28,7 @@ available.
 * Enabled use of alternative readers via `VisiumIO.csvreader` option 
 * Included metadata in `SpatialExperiment` outputs
 
-### Bug fixes
+### Bug fixes and minor improvements
 
 * Resolved issue where `*_feature_bc_matrix` folder checks were incorrectly
   triggered for non-mtx formats (@estellad, #4)
