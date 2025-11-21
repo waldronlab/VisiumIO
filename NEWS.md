@@ -19,7 +19,7 @@
 * `tissuePos` and `binSize` can be optional parameters for `TENxVisiumHD`
   imports, esp. for `segmented_outputs` inputs 
   
-## Bug fixes and minor improvements
+### Bug fixes and minor improvements
 
 * Folder inputs to arguments such as `spacerangerOut` are not required to
 contain an `outs/` directory. These inputs should be used directly, if
@@ -33,7 +33,7 @@ available.
 * Enabled use of alternative readers via `VisiumIO.csvreader` option 
 * Included metadata in `SpatialExperiment` outputs
 
-### Bug fixes
+### Bug fixes and minor improvements
 
 * Resolved issue where `*_feature_bc_matrix` folder checks were incorrectly
   triggered for non-mtx formats (@estellad, #4)
