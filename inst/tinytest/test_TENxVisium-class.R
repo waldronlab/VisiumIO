@@ -14,7 +14,7 @@ expect_true(
     validObject(tv)
 )
 
-expect_error(
+expect_silent(
     TENxVisium(
         spacerangerOut = dirname(outs_dir),
         processing = "raw",
