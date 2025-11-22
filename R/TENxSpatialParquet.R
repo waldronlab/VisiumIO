@@ -53,6 +53,15 @@
 TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
     if (!is(resource, "TENxFile"))
         resource <- TENxFile(resource)
+    checkInstalled("arrow")
+    cnames <- names(arrow::open_dataset(path(resource)))
+    if (!all(colnames %in% cnames)) {
+        warning(
+            "The provided column names do not match all in the Parquet file.",
+            call. = FALSE
+        )
+        colnames <- intersect(colnames, cnames)
+    }
     .TENxSpatialParquet(
         resource, colnames = colnames
     )
