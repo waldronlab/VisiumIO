@@ -80,7 +80,9 @@ TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
 setMethod("import", "TENxSpatialParquet", function(con, format, text, ...) {
     checkInstalled("arrow")
     res <- arrow::read_parquet(
-        path(con)
+        file = path(con),
+        col_select = con@colnames,
+        ...
     )
     attr(res, "metadata") <- metadata(con)
     res
