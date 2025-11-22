@@ -236,6 +236,7 @@ TENxVisiumHD <- function(
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions\\.parquet",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+    mappingPattern = "barcode_mappings\\.parquet",
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -318,6 +319,7 @@ TENxVisiumHD <- function(
         jsonFile = jsonFile,
         tissuePattern = tissuePattern,
         spatialCoordsNames = spatialCoordsNames,
+        mappingPattern = mappingPattern,
         ...
     )
 

@@ -1,5 +1,8 @@
 setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
+#' @include TENxParquet-class.R
+setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
+
 #' @docType class
 #'
 #' @title A class to represent and import a single Visium Sample
@@ -21,6 +24,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' @slot spatialList A [TENxSpatialList] object containing the spatial
 #'
+#' @slot mapping A [TENxMappingParquet] object or `NULL` containing the barcode
+#'   mapping data.
+#'
 #' @slot coordNames `character()` A vector specifying the names
 #'   of the columns in the spatial data containing the spatial coordinates.
 #'
@@ -37,6 +43,7 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
     slots = c(
         resources = "TENxFileList_OR_TENxH5",
         spatialList = "TENxSpatialList",
+        mapping = "TENxMappingParquet_OR_NULL",
         coordNames = "character",
         sampleId = "character"
     )
@@ -129,6 +136,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #' @param spatialCoordsNames `character()` A vector of strings specifying the
 #'  names of the columns in the spatial data containing the spatial coordinates.
 #'
+#' @param mappingPattern `character(1)` A single string specifying the pattern
+#'  to match the barcode mapping parquet file.
+#'
 #' @param ... In the constructor, additional arguments passed to
 #'   [TENxFileList][TENxIO::TENxFileList-class]; otherwise, not used.
 #'
@@ -197,6 +207,7 @@ TENxVisium <- function(
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*\\.csv",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+    mappingPattern = "barcode_mappings\\.parquet",
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
