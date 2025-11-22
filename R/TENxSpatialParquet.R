@@ -37,14 +37,16 @@
 #'     package = "VisiumIO"
 #' )
 #' spatial_dir <- Filter(
-#'   function(x) endsWith(x, "spatial"), list.dirs(sample_dir)
+#'     function(x) endsWith(x, "spatial"), list.dirs(sample_dir)
 #' )
 #' parquetres <- file.path(spatial_dir, "tissue_positions.parquet")
 #' TENxSpatialParquet(parquetres)
-#' import(TENxSpatialParquet(parquetres))
+#' TENxSpatialParquet(parquetres) |>
+#'     import()
 #'
 #' ## metadata in attributes
-#' import(TENxSpatialParquet(parquetres)) |>
+#' TENxSpatialParquet(parquetres) |>
+#'     import() |>
 #'     attr("metadata") |>
 #'     lapply(names)
 #' @export
