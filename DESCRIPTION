@@ -44,6 +44,7 @@ BugReports: https://github.com/waldronlab/VisiumIO/issues
 URL: https://github.com/waldronlab/VisiumIO
 Collate:
     'TENxGeoJSON.R'
+    'TENxParquet-class.R'
     'TENxSpatialCSV.R'
     'TENxSpatialList-class.R'
     'TENxSpatialParquet.R'
