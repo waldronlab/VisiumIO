@@ -158,6 +158,7 @@ TENxVisiumHD(
 ) |>
     import()
 
+## with segmented_outputs folder
 seg_outs <- system.file(
     "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
 )

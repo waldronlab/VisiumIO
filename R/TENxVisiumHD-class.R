@@ -212,6 +212,7 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 #' ) |>
 #'     import()
 #'
+#' ## with segmented_outputs folder
 #' seg_outs <- system.file(
 #'     "extdata", "segmented_outputs", package = "VisiumIO", mustWork = TRUE
 #' )
