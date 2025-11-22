@@ -215,7 +215,8 @@ TENxVisium <- function(
             type = "bc",
             sample_id = sample_id,
             images = images,
-            jsonFile = jsonFile, tissuePattern = tissuePattern
+            jsonFile = jsonFile,
+            tissuePattern = tissuePattern
         )
     } else {
         stopifnot(
@@ -234,8 +235,10 @@ TENxVisium <- function(
             resources <- TENxFileList(resources, ...)
         if (!is(spatialResource, "TENxSpatialList"))
             spatialResource <- TENxSpatialList(
-                resources = spatialResource, sample_id = sample_id,
-                images = images, jsonFile = jsonFile,
+                resources = spatialResource,
+                sample_id = sample_id,
+                images = images,
+                jsonFile = jsonFile,
                 tissuePattern = tissuePattern
             )
     }
