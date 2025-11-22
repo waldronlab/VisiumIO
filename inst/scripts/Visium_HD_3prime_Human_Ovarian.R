@@ -1,5 +1,6 @@
 ##  Prepare smaller example files from the
 ## Visium_HD_3prime_Human_Ovarian_Cancer_segmented_outputs
+## https://www.10xgenomics.com/datasets/visium-hd-three-prime-ovarian-cancer-fresh-frozen
 
 library(sf)
 cseg <- file.path(
@@ -56,3 +57,22 @@ h5write(h3, h5new, "/matrix/features/id")
 h5write(h4, h5new, "/matrix/features/name")
 
 TENxH5(h5new)
+file.info(h5new)$size
+
+park <- arrow::read_parquet(
+    file.path(
+        "~/data",
+        "visium-hd-three-prime-ovarian-cancer-fresh-frozen",
+        "Visium_HD_3prime_Human_Ovarian_Cancer_barcode_mappings.parquet"
+    )
+)
+ss <- TENxH5(
+    "inst/extdata/segmented_outputs/filtered_feature_cell_matrix.h5",
+    ranges = NA_character_
+) |> import()
+writepq <- park[park$cell_id %in% colnames(ss),]
+
+arrow::write_parquet(
+    writepq,
+    sink = "inst/extdata/barcode_mappings.parquet"
+)
