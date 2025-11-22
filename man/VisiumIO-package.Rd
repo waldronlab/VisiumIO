@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Estella YiXing Dong [contributor]
   \item Dario Righelli [contributor]
   \item Helena Crowell [contributor]
 }
