@@ -12,19 +12,13 @@
 #'   "pxl_row_in_fullres", "pxl_col_in_fullres")`. The column names can be
 #'   changed by specifying the `colnames` argument in the constructor function.
 #'
-#' @slot colnames `character()` A vector specifying the column names of the
-#'   Parquet
-#'
 #' @importClassesFrom TENxIO TENxFile
 #' @importFrom methods new is
 #'
 #' @exportClass TENxSpatialParquet
 .TENxSpatialParquet <- setClass(
     Class = "TENxSpatialParquet",
-    contains = "TENxFile",
-    slots = c(
-        colnames = "character"
-    )
+    contains = "TENxParquet"
 )
 
 #' @rdname TENxSpatialParquet-class
