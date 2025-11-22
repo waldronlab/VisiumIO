@@ -62,7 +62,7 @@ TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
 #'
 #' @importFrom BiocBaseUtils checkInstalled
 #'
-#' @return import-method: A `DataFrame` object containing the data from the
+#' @return import-method: A `tibble` object containing the data from the
 #'   Parquet file
 #'
 #' @exportMethod import

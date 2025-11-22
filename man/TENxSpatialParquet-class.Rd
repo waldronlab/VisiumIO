@@ -38,7 +38,7 @@ providing the string data to import.}
 \value{
 \code{TENxSpatialParquet()}: An object of class \link{TENxSpatialParquet}
 
-import-method: A \code{DataFrame} object containing the data from the
+import-method: A \code{tibble} object containing the data from the
 Parquet file
 }
 \description{
