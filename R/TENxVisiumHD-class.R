@@ -128,7 +128,6 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     } else {
         if (identical(format, "h5"))
             path <- .filter_h5_files(path, processing, format, type)
-
     }
     if (identical(format, "mtx"))
         path <- .check_filter_mtx(path)
@@ -143,6 +142,26 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
         path <- .exclude_h5_files(path)
     }
     TENxSpatialList(path, ...)
+}
+
+.OUTS_FOLDERS <- c("outs", "binned_outputs", "segmented_outputs")
+
+.find_convert_maps <- function(path, pattern) {
+    if (is(path, "TENxFileList") || is(path, "TENxFile"))
+        path <- dirname(path(path)) |> unique()
+
+    while (any(.OUTS_FOLDERS %in% strsplit(path, .Platform$file.sep)[[1L]])) {
+        path <- dirname(path)
+        .find_convert_maps(path, pattern)
+    }
+
+    mapfile <- list.files(
+        path = path, pattern = pattern, full.names = TRUE, recursive = TRUE
+    )
+    if (!isScalarCharacter(mapfile) || !file.exists(mapfile))
+        NULL
+    else
+        TENxParquet(mapfile)
 }
 
 #' @rdname TENxVisiumHD-class
@@ -347,6 +366,10 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
 
     sce <- import(con@resources)
     slist <- import(con@spatialList)
+    hasMap <- !is.null(con@mapping)
+    if (hasMap)
+        map <- import(con@mapping)
+
     img <- slist[["imgData"]]
     sce_cellids <-  strsplit(colnames(sce), "_|-") |>
         vapply(`[`, character(1), 2L) |>
@@ -360,7 +383,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     colnames(coords) <- con@coordNames
     rownames(coords) <- centroids[["cell_id"]]
 
-    SpatialExperiment(
+    res <- SpatialExperiment(
         assays = list(counts = assay(sce)),
         rowData = rowData(sce),
         mainExpName = mainExpName(sce),
@@ -375,4 +398,12 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
             cellseg = geo_data
         )
     )
+
+    if (hasMap) {
+        all(map[["cell_id"]] %in% colnames(res)) || stop(
+            "Not all cell IDs in the mapping file are present in the data."
+        )
+    }
+    res
+
 })

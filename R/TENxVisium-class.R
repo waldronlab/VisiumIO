@@ -229,6 +229,7 @@ TENxVisium <- function(
             jsonFile = jsonFile,
             tissuePattern = tissuePattern
         )
+        mapping <- .find_convert_maps(spacerangerOut, mappingPattern)
     } else {
         stopifnot(
             (isScalarCharacter(resources) && file.exists(resources)) ||
@@ -252,12 +253,14 @@ TENxVisium <- function(
                 jsonFile = jsonFile,
                 tissuePattern = tissuePattern
             )
+        mapping <- .find_convert_maps(resources, mappingPattern)
     }
 
     .TENxVisium(
         resources = resources,
         spatialList = spatialResource,
         coordNames = spatialCoordsNames,
+        mapping = mapping,
         sampleId = sample_id
     )
 }
@@ -292,6 +295,8 @@ S4Vectors::setValidity2("TENxVisium", .validTENxVisium)
 setMethod("import", "TENxVisium", function(con, format, text, ...) {
     sce <- import(con@resources)
     slist <- import(con@spatialList)
+    map <- import(con@mapping)
+
     img <- slist[["imgData"]]
     spd <- slist[["colData"]]
     is_tbl_df <- inherits(spd, "tbl_df")
