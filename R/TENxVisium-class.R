@@ -1,8 +1,5 @@
 setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 
-#' @include TENxParquet-class.R
-setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
-
 #' @docType class
 #'
 #' @title A class to represent and import a single Visium Sample
@@ -24,9 +21,6 @@ setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
 #'
 #' @slot spatialList A [TENxSpatialList] object containing the spatial
 #'
-#' @slot mapping A [TENxMappingParquet] object or `NULL` containing the barcode
-#'   mapping data.
-#'
 #' @slot coordNames `character()` A vector specifying the names
 #'   of the columns in the spatial data containing the spatial coordinates.
 #'
@@ -43,7 +37,6 @@ setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
     slots = c(
         resources = "TENxFileList_OR_TENxH5",
         spatialList = "TENxSpatialList",
-        mapping = "TENxMappingParquet_OR_NULL",
         coordNames = "character",
         sampleId = "character"
     )
@@ -136,9 +129,6 @@ setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
 #' @param spatialCoordsNames `character()` A vector of strings specifying the
 #'  names of the columns in the spatial data containing the spatial coordinates.
 #'
-#' @param mappingPattern `character(1)` A single string specifying the pattern
-#'  to match the barcode mapping parquet file.
-#'
 #' @param ... In the constructor, additional arguments passed to
 #'   [TENxFileList][TENxIO::TENxFileList-class]; otherwise, not used.
 #'
@@ -207,7 +197,6 @@ TENxVisium <- function(
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*\\.csv",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
-    mappingPattern = "barcode_mappings\\.parquet",
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -229,7 +218,6 @@ TENxVisium <- function(
             jsonFile = jsonFile,
             tissuePattern = tissuePattern
         )
-        mapping <- .find_convert_maps(spacerangerOut, mappingPattern)
     } else {
         stopifnot(
             (isScalarCharacter(resources) && file.exists(resources)) ||
@@ -253,14 +241,12 @@ TENxVisium <- function(
                 jsonFile = jsonFile,
                 tissuePattern = tissuePattern
             )
-        mapping <- .find_convert_maps(resources, mappingPattern)
     }
 
     .TENxVisium(
         resources = resources,
         spatialList = spatialResource,
         coordNames = spatialCoordsNames,
-        mapping = mapping,
         sampleId = sample_id
     )
 }
@@ -295,7 +281,6 @@ S4Vectors::setValidity2("TENxVisium", .validTENxVisium)
 setMethod("import", "TENxVisium", function(con, format, text, ...) {
     sce <- import(con@resources)
     slist <- import(con@spatialList)
-    map <- import(con@mapping)
 
     img <- slist[["imgData"]]
     spd <- slist[["colData"]]
