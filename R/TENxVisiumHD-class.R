@@ -1,6 +1,10 @@
+#' @include TENxVisiumList-class.R
 setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 
-#' @include TENxVisiumList-class.R
+#' @include TENxParquet-class.R
+setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
+
+setClassUnion("character_OR_NULL", c("character", "NULL"))
 
 #' @docType class
 #'
@@ -18,6 +22,9 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 #'
 #' @inheritParams TENxVisiumList-class
 #'
+#' @slot mapping A [TENxMappingParquet] object or `NULL` containing the barcode
+#'   mapping data.
+#'
 #' @return A [SpatialExperiment][SpatialExperiment::SpatialExperiment-class]
 #'   object
 #'
@@ -26,8 +33,10 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
     Class = "TENxVisiumHD",
     contains = "TENxVisium",
     slots = c(
+        binSize = "character_OR_NULL",
         cellseg = "logical",
-        geojson = "TENxGeoJSON_OR_NULL"
+        geojson = "TENxGeoJSON_OR_NULL",
+        mapping = "TENxMappingParquet_OR_NULL"
     )
 )
 
@@ -260,7 +269,8 @@ TENxVisiumHD <- function(
 ) {
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
-    bin_size <- match.arg(bin_size)
+    bin_size <-
+        if (missing(bin_size)) NULL else match.arg(bin_size)
     format <- match.arg(format)
     cellseg <- FALSE
     geojson <- NULL
@@ -327,6 +337,9 @@ TENxVisiumHD <- function(
             tissuePattern = tissuePattern
         )
     }
+    mapping <- .find_convert_maps(
+        path = resources, pattern = mappingPattern
+    )
 
     txv <- TENxVisium(
         resources = resources,
@@ -342,7 +355,13 @@ TENxVisiumHD <- function(
         ...
     )
 
-    .TENxVisiumHD(txv, cellseg = cellseg, geojson = geojson)
+    .TENxVisiumHD(
+        txv,
+        cellseg = cellseg,
+        geojson = geojson,
+        binSize = bin_size,
+        mapping = mapping
+    )
 }
 
 # import TENxVisiumHD method ----------------------------------------------
@@ -355,33 +374,70 @@ TENxVisiumHD <- function(
 #'
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
-    if (!con@cellseg)
-        return(
-            methods::callNextMethod()
-        )
-    checkInstalled("sf")
-    geo_data <- import(con@geojson)
-    centroids <- sf::st_centroid(geo_data)
-    centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
+    if (con@cellseg) {
+        checkInstalled("sf")
+        geo_data <- import(con@geojson)
+        centroids <- sf::st_centroid(geo_data)
+        centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
+        sce <- import(con@resources)
+        slist <- import(con@spatialList)
+        img <- slist[["imgData"]]
+    } else {
+        sce <- methods::callNextMethod()
+        img <- SpatialExperiment::imgData(sce)
+    }
 
-    sce <- import(con@resources)
-    slist <- import(con@spatialList)
     hasMap <- !is.null(con@mapping)
-    if (hasMap)
+    if (hasMap) {
         map <- import(con@mapping)
+        if (!is.null(con@binSize)) {
+            binCol <- grepv(con@binSize, names(map), TRUE)
+            hasRows <- any(colnames(sce) %in% map[[binCol]])
+            map <-
+                if (length(binCol) && hasRows)
+                    map[, c(binCol, "cell_id", "in_nucleus", "in_cell")]
+                else
+                    NULL
+        } else {
+            binCol <- "cell_id"
+        }
+        ididx <- na.omit(
+            match(colnames(sce), map[[binCol]])
+        )
+        if (length(ididx)) {
+            map <- map[ididx, ]
+            spd<- cbind(
+                colData(sce),
+                map[match(colnames(sce), map[[binCol]]), , drop = FALSE]
+            )
+        }
+    }
 
-    img <- slist[["imgData"]]
-    sce_cellids <-  strsplit(colnames(sce), "_|-") |>
-        vapply(`[`, character(1), 2L) |>
-        sub("0*([1-9]+)", "\\1", x = _)
+    metadata <- list(
+        resouces = metadata(sce),
+        spatialList = metadata(con@spatialList)
+    )
 
-    common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
-    centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
-    sce <- sce[, match(common_cells, sce_cellids)]
+    coords <- NULL
+    spatialCoordsNames <- NULL
+    if (con@cellseg) {
+        sce_cellids <-  strsplit(colnames(sce), "_|-") |>
+            vapply(`[`, character(1), 2L) |>
+            sub("0*([1-9]+)", "\\1", x = _)
 
-    coords <- sf::st_coordinates(centroids)
-    colnames(coords) <- con@coordNames
-    rownames(coords) <- centroids[["cell_id"]]
+        common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
+        centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
+        sce <- sce[, match(common_cells, sce_cellids)]
+        coords <- sf::st_coordinates(centroids)
+        colnames(coords) <- spatialCoordsNames <- con@coordNames
+        rownames(coords) <- centroids[["cell_id"]]
+        metadata <- c(
+            metadata,
+            list(
+                cellseg = geo_data
+            )
+        )
+    }
 
     res <- SpatialExperiment(
         assays = list(counts = assay(sce)),
@@ -391,12 +447,9 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         sample_id = con@sampleId,
         colData = colData(sce),
         spatialCoords = coords,
+        spatialCoordsNames = spatialCoordsNames,
         imgData = img,
-        metadata = list(
-            resources = metadata(sce),
-            spatialList = metadata(con@spatialList),
-            cellseg = geo_data
-        )
+        metadata = metadata
     )
 
     if (hasMap) {
@@ -404,6 +457,6 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
             "Not all cell IDs in the mapping file are present in the data."
         )
     }
-    res
 
+    res
 })
