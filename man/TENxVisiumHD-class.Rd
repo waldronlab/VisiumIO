@@ -69,9 +69,6 @@ to match the tissue positions file.}
 \item{spatialCoordsNames}{\code{character()} A vector of strings specifying the
 names of the columns in the spatial data containing the spatial coordinates.}
 
-\item{mappingPattern}{\code{character(1)} A single string specifying the pattern
-to match the barcode mapping parquet file.}
-
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
 
@@ -107,6 +104,13 @@ command outputs a folder containing the "raw" or "filtered"
 \item \code{import(con = TENxVisiumHD, format = ANY, text = ANY)}: Import Visium HD data from multiple bin sizes
 
 }}
+\section{Slots}{
+
+\describe{
+\item{\code{mapping}}{A \link{TENxMappingParquet} object or \code{NULL} containing the barcode
+mapping data.}
+}}
+
 \examples{
 
 vdir <- system.file(

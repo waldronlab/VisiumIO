@@ -19,7 +19,6 @@ TENxVisium(
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*\\\\.csv",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
-  mappingPattern = "barcode_mappings\\\\.parquet",
   ...
 )
 
@@ -59,9 +58,6 @@ to match the tissue positions file.}
 
 \item{spatialCoordsNames}{\code{character()} A vector of strings specifying the
 names of the columns in the spatial data containing the spatial coordinates.}
-
-\item{mappingPattern}{\code{character(1)} A single string specifying the pattern
-to match the barcode mapping parquet file.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
@@ -107,9 +103,6 @@ arguments are paths to files.
 \link[TENxIO:TENxH5-class]{TENxH5} object containing the Visium data.}
 
 \item{\code{spatialList}}{A \link{TENxSpatialList} object containing the spatial}
-
-\item{\code{mapping}}{A \link{TENxMappingParquet} object or \code{NULL} containing the barcode
-mapping data.}
 
 \item{\code{coordNames}}{\code{character()} A vector specifying the names
 of the columns in the spatial data containing the spatial coordinates.}
