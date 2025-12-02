@@ -374,72 +374,43 @@ TENxVisiumHD <- function(
 #'
 #' @exportMethod import
 setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
-    if (con@cellseg) {
-        checkInstalled("sf")
-        geo_data <- import(con@geojson)
-        centroids <- sf::st_centroid(geo_data)
-        centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
-        sce <- import(con@resources)
-        slist <- import(con@spatialList)
-        img <- slist[["imgData"]]
-    } else {
-        sce <- methods::callNextMethod()
-        img <- SpatialExperiment::imgData(sce)
-    }
+    .import_fun <-
+        if (con@cellseg)
+            .import_cellseg
+        else if (!is.null(con@binSize))
+            .import_binsize
 
-    hasMap <- !is.null(con@mapping)
-    if (hasMap) {
-        map <- import(con@mapping)
-        if (!is.null(con@binSize)) {
-            binCol <- grepv(con@binSize, names(map), TRUE)
-            hasRows <- any(colnames(sce) %in% map[[binCol]])
-            map <-
-                if (length(binCol) && hasRows)
-                    map[, c(binCol, "cell_id", "in_nucleus", "in_cell")]
-                else
-                    NULL
-        } else {
-            binCol <- "cell_id"
-        }
-        ididx <- na.omit(
-            match(colnames(sce), map[[binCol]])
-        )
-        if (length(ididx)) {
-            map <- map[ididx, ]
-            spd<- cbind(
-                colData(sce),
-                map[match(colnames(sce), map[[binCol]]), , drop = FALSE]
-            )
-        }
-    }
+    .import_fun(con)
+    ## TODO: validate mapping cell IDs
+    ## if (!is.null(con@mapping)) {
+    ##     all(map[["cell_id"]] %in% colnames(res)) || stop(
+    ##         "Not all cell IDs in the mapping file are present in the data."
+    ##     )
+    ## }
+})
 
-    metadata <- list(
-        resouces = metadata(sce),
-        spatialList = metadata(con@spatialList)
-    )
+.import_cellseg <- function(con) {
+    checkInstalled("sf")
+    geo_data <- import(con@geojson)
+    centroids <- sf::st_centroid(geo_data)
+    centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
+    sce <- import(con@resources)
+    slist <- import(con@spatialList)
+    img <- slist[["imgData"]]
 
-    coords <- NULL
-    spatialCoordsNames <- NULL
-    if (con@cellseg) {
-        sce_cellids <-  strsplit(colnames(sce), "_|-") |>
-            vapply(`[`, character(1), 2L) |>
-            sub("0*([1-9]+)", "\\1", x = _)
+    sce <- .add_map_to_sce(sce, con)
+    sce_cellids <-  strsplit(colnames(sce), "_|-") |>
+        vapply(`[`, character(1), 2L) |>
+        sub("0*([1-9]+)", "\\1", x = _)
 
-        common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
-        centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
-        sce <- sce[, match(common_cells, sce_cellids)]
-        coords <- sf::st_coordinates(centroids)
-        colnames(coords) <- spatialCoordsNames <- con@coordNames
-        rownames(coords) <- centroids[["cell_id"]]
-        metadata <- c(
-            metadata,
-            list(
-                cellseg = geo_data
-            )
-        )
-    }
+    common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
+    centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
+    sce <- sce[, match(common_cells, sce_cellids)]
+    coords <- sf::st_coordinates(centroids)
+    colnames(coords) <- con@coordNames
+    rownames(coords) <- centroids[["cell_id"]]
 
-    res <- SpatialExperiment(
+    SpatialExperiment(
         assays = list(counts = assay(sce)),
         rowData = rowData(sce),
         mainExpName = mainExpName(sce),
@@ -447,16 +418,65 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         sample_id = con@sampleId,
         colData = colData(sce),
         spatialCoords = coords,
-        spatialCoordsNames = spatialCoordsNames,
         imgData = img,
-        metadata = metadata
-    )
-
-    if (hasMap) {
-        all(map[["cell_id"]] %in% colnames(res)) || stop(
-            "Not all cell IDs in the mapping file are present in the data."
+        metadata = list(
+            resouces = metadata(sce),
+            spatialList = metadata(con@spatialList),
+            cellseg = geo_data
         )
-    }
+    )
+}
 
-    res
-})
+.add_map_to_sce <- function(sce, con) {
+    bin_size <- con@binSize
+    hasMap <- !is.null(con@mapping)
+    if (!hasMap)
+        return(sce)
+
+    map <- import(con@mapping)
+    if (!is.null(bin_size)) {
+        binCol <- grepv(bin_size, names(map), TRUE)
+        hasRows <- any(colnames(sce) %in% map[[binCol]])
+        map <- if (length(binCol) && hasRows)
+                map[, c(binCol, "cell_id", "in_nucleus", "in_cell")]
+            else
+                NULL
+        ididx <- na.omit(
+            match(colnames(sce), map[[binCol]])
+        )
+        if (length(ididx)) {
+            map <- map[ididx, ]
+            colData(sce) <- cbind(
+                colData(sce),
+                map[match(colnames(sce), map[[binCol]]), , drop = FALSE]
+            )
+        }
+    } else {
+        map <- map[map[["cell_id"]] %in% colnames(sce), ]
+        map <- split(map, map$cell_id)
+        idx <- match(colnames(sce), names(map))
+        sce$map <- map[idx]
+    }
+    sce
+}
+
+.import_binsize <- function(con) {
+    sce <- import(con@resources)
+    slist <- import(con@spatialList)
+    img <- slist[["imgData"]]
+    sce <- .add_map_to_sce(sce, con)
+
+    SpatialExperiment(
+        assays = list(counts = assay(sce)),
+        rowData = rowData(sce),
+        mainExpName = mainExpName(sce),
+        altExps = altExps(sce),
+        sample_id = con@sampleId,
+        colData = colData(sce),
+        imgData = img,
+        metadata = list(
+            resouces = metadata(sce),
+            spatialList = metadata(con@spatialList)
+        )
+    )
+}
