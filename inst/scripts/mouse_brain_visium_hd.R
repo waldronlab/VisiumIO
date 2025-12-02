@@ -1,3 +1,11 @@
+## Source URL
+## https://www.10xgenomics.com/datasets/
+##   visium-hd-cytassist-gene-expression-libraries-of-mouse-brain-he
+## curl -O https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/
+##   Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_feature_slice.h5
+##   Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_spatial.tar.gz
+##   Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz
+
 library(rhdf5)
 orig <-
     "~/data/Visium_HD_Mouse_Brain_binned_outputs/binned_outputs/square_002um/"
