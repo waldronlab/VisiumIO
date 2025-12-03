@@ -404,7 +404,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     colnames(coords) <- con@coordNames
     rownames(coords) <- centroids[["cell_id"]]
 
-    res <- SpatialExperiment(
+    SpatialExperiment(
         assays = list(counts = assay(sce)),
         rowData = rowData(sce),
         mainExpName = mainExpName(sce),
@@ -419,13 +419,6 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
             cellseg = geo_data
         )
     )
-
-    all(
-        names(colData(res)[["map"]]) %in% colnames(res)
-    ) || stop(
-        "Not all cell IDs in the mapping file are present in the data."
-    )
-    res
 }
 
 .add_map_to_sce <- function(sce, con) {
@@ -437,20 +430,11 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     map <- import(con@mapping)
     if (!is.null(bin_size)) {
         binCol <- grepv(bin_size, names(map), TRUE)
-        hasRows <- any(colnames(sce) %in% map[[binCol]])
-        map <- if (length(binCol) && hasRows)
-                map[, c(binCol, "cell_id", "in_nucleus", "in_cell")]
-            else
-                NULL
-        ididx <- na.omit(
-            match(colnames(sce), map[[binCol]])
-        )
-        if (length(ididx)) {
-            map <- map[ididx, ]
-            colData(sce) <- cbind(
-                colData(sce),
-                map[match(colnames(sce), map[[binCol]]), , drop = FALSE]
-            )
+        matches <- match(colnames(sce), map[[binCol]])
+        if (length(binCol) && (length(matches) && !all(is.na(matches)))) {
+            matched_map <-
+                map[matches, , drop = FALSE]
+            colData(sce) <- cbind(colData(sce), matched_map)
         }
     } else {
         map <- map[map[["cell_id"]] %in% colnames(sce), ]
