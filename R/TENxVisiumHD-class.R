@@ -440,6 +440,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         }
     } else {
         map <- map[map[["cell_id"]] %in% colnames(sce), ]
+        map <- map[map[["in_cell"]], ]
         map <- split(map, map[["cell_id"]])
         idx <- match(colnames(sce), names(map))
         sce$map <- map[idx]
