@@ -385,23 +385,19 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
 
 .import_cellseg <- function(con) {
     checkInstalled("sf")
-    geo_data <- import(con@geojson)
-    centroids <- sf::st_centroid(geo_data)
-    centroids[["cell_id"]] <- as.character(centroids[["cell_id"]])
+
     sce <- import(con@resources)
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]
 
-    sce <- .add_map_to_sce(sce, con)
-    sce_cellids <-  strsplit(colnames(sce), "_|-") |>
-        vapply(`[`, character(1L), 2L) |>
-        sub("0*([1-9]+)", "\\1", x = _)
+    geo_data <- import(con@geojson)
+    geo_data <- .repair_cell_ids(geo_data, colnames(sce))
+    centroids <- sf::st_centroid(geo_data)
 
-    keep_idx <- sce_cellids %in% centroids[["cell_id"]]
-    sce_cellids <- sce_cellids[keep_idx]
+    sce <- .add_map_to_sce(sce, con)
+    keep_idx <- colnames(sce) %in% centroids[["cell_id"]]
     sce <- sce[, keep_idx]
 
-    centroids <- centroids[match(sce_cellids, centroids[["cell_id"]]), ]
     coords <- sf::st_coordinates(centroids)
     colnames(coords) <- con@coordNames
     rownames(coords) <- centroids[["cell_id"]]

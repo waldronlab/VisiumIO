@@ -55,6 +55,18 @@
     )
 }
 
+.repair_cell_ids <- function(sf, cnames) {
+    sf[["cell_id"]] <- as.character(sf[["cell_id"]])
+    sce_cellids <-  strsplit(cnames, "_|-") |>
+        vapply(`[`, character(1L), 2L) |>
+        sub("0*([1-9]+)", "\\1", x = _)
+
+    common_ids <- intersect(sf[["cell_id"]], sce_cellids)
+    sf <- sf[match(common_ids, sf[["cell_id"]]),]
+    sf[["cell_id"]] <- cnames[match(common_ids, sce_cellids)]
+    sf
+}
+
 #' Compare barcodes between raw and filtered data
 #'
 #' @description This function compares the barcodes between raw and filtered
