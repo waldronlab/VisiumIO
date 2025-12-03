@@ -394,12 +394,14 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
 
     sce <- .add_map_to_sce(sce, con)
     sce_cellids <-  strsplit(colnames(sce), "_|-") |>
-        vapply(`[`, character(1), 2L) |>
+        vapply(`[`, character(1L), 2L) |>
         sub("0*([1-9]+)", "\\1", x = _)
 
-    common_cells <- intersect(centroids[["cell_id"]], sce_cellids)
-    centroids <- centroids[match(common_cells, centroids[["cell_id"]]), ]
-    sce <- sce[, match(common_cells, sce_cellids)]
+    keep_idx <- sce_cellids %in% centroids[["cell_id"]]
+    sce_cellids <- sce_cellids[keep_idx]
+    sce <- sce[, keep_idx]
+
+    centroids <- centroids[match(sce_cellids, centroids[["cell_id"]]), ]
     coords <- sf::st_coordinates(centroids)
     colnames(coords) <- con@coordNames
     rownames(coords) <- centroids[["cell_id"]]
@@ -431,14 +433,14 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     if (!is.null(bin_size)) {
         binCol <- grepv(bin_size, names(map), TRUE)
         matches <- match(colnames(sce), map[[binCol]])
-        if (length(binCol) && (length(matches) && !all(is.na(matches)))) {
+        if (length(binCol) && length(matches) && !all(is.na(matches))) {
             matched_map <-
                 map[matches, , drop = FALSE]
             colData(sce) <- cbind(colData(sce), matched_map)
         }
     } else {
         map <- map[map[["cell_id"]] %in% colnames(sce), ]
-        map <- split(map, map$cell_id)
+        map <- split(map, map[["cell_id"]])
         idx <- match(colnames(sce), names(map))
         sce$map <- map[idx]
     }
