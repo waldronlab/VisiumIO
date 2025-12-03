@@ -381,12 +381,6 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
             .import_binsize
 
     .import_fun(con)
-    ## TODO: validate mapping cell IDs
-    ## if (!is.null(con@mapping)) {
-    ##     all(map[["cell_id"]] %in% colnames(res)) || stop(
-    ##         "Not all cell IDs in the mapping file are present in the data."
-    ##     )
-    ## }
 })
 
 .import_cellseg <- function(con) {
@@ -410,7 +404,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     colnames(coords) <- con@coordNames
     rownames(coords) <- centroids[["cell_id"]]
 
-    SpatialExperiment(
+    res <- SpatialExperiment(
         assays = list(counts = assay(sce)),
         rowData = rowData(sce),
         mainExpName = mainExpName(sce),
@@ -425,6 +419,13 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
             cellseg = geo_data
         )
     )
+
+    all(
+        names(colData(res)[["map"]]) %in% colnames(res)
+    ) || stop(
+        "Not all cell IDs in the mapping file are present in the data."
+    )
+    res
 }
 
 .add_map_to_sce <- function(sce, con) {
