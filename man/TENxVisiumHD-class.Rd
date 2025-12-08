@@ -22,6 +22,7 @@ TENxVisiumHD(
   tissuePattern = "tissue_positions\\\\.parquet",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
   mappingPattern = "barcode_mappings\\\\.parquet",
+  boundary = c("cell_segmentations", "nucleus_segmentations"),
   ...
 )
 
@@ -68,6 +69,9 @@ to match the tissue positions file.}
 
 \item{spatialCoordsNames}{\code{character()} A vector of strings specifying the
 names of the columns in the spatial data containing the spatial coordinates.}
+
+\item{boundary}{\code{character(1)} The type of segmentation boundary to use. The
+options are \code{"cell_segmentations"} (default) or \code{"nucleus_segmentations"}.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}

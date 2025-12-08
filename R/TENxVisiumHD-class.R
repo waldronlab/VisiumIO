@@ -36,6 +36,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
         binSize = "character_OR_NULL",
         cellseg = "logical",
         geojson = "TENxGeoJSON_OR_NULL",
+        boundary = "character",
         mapping = "TENxMappingParquet_OR_NULL"
     )
 )
@@ -181,6 +182,9 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #' @param segmented_outputs `character(1)` The path to the `segmented_outputs`
 #'   directory
 #'
+#' @param boundary `character(1)` The type of segmentation boundary to use. The
+#'   options are `"cell_segmentations"` (default) or `"nucleus_segmentations"`.
+#'
 #' @param bin_size `character(1)` The bin size of the images to import. The
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.
@@ -265,6 +269,7 @@ TENxVisiumHD <- function(
     tissuePattern = "tissue_positions\\.parquet",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
     mappingPattern = "barcode_mappings\\.parquet",
+    boundary = c("cell_segmentations", "nucleus_segmentations"),
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -272,6 +277,7 @@ TENxVisiumHD <- function(
     bin_size <-
         if (missing(bin_size)) NULL else match.arg(bin_size)
     format <- match.arg(format)
+    boundary <- match.arg(boundary)
     cellseg <- FALSE
     geojson <- NULL
 
@@ -307,7 +313,9 @@ TENxVisiumHD <- function(
             )
             tissuePattern <- bin_size <- NULL
             geojson <- TENxGeoJSON(
-                file.path(segmented_outputs, "cell_segmentations.geojson")
+                file.path(
+                    segmented_outputs, paste0(boundary, ".geojson")
+                )
             )
             data_folder <- segmented_outputs
             cellseg <- TRUE
@@ -358,6 +366,7 @@ TENxVisiumHD <- function(
     .TENxVisiumHD(
         txv,
         cellseg = cellseg,
+        boundary = boundary,
         geojson = geojson,
         binSize = bin_size,
         mapping = mapping
@@ -414,7 +423,8 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         metadata = list(
             resouces = metadata(sce),
             spatialList = metadata(con@spatialList),
-            cellseg = geo_data
+            cellseg = geo_data,
+            boundary = con@boundary
         )
     )
 }
