@@ -483,10 +483,23 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     sce
 }
 
+#' @importFrom SummarizedExperiment colData<-
 .import_binsize <- function(con) {
     sce <- import(con@resources)
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]
+    spd <- slist[["colData"]]
+    is_tbl_df <- inherits(spd, "tbl_df")
+    rownames <-
+        if (is_tbl_df) spd[["barcode"]] else rownames(spd)
+    matches <- match(colnames(sce), rownames)
+    if (!length(matches))
+        stop(
+            "No matching barcodes were found between the expression data ",
+            "and spatial data."
+        )
+    colData(sce) <- cbind(colData(sce), spd[matches, ])
+
     sce <- .add_map_to_sce(sce, con)
 
     SpatialExperiment(
