@@ -3,7 +3,7 @@
     "cell_id", "in_nucleus", "in_cell"
 )
 
-#' @name TENxParquet
+#' @docType class
 #'
 #' @title Represent and import Parquet data from 10X Genomics
 #'
@@ -14,9 +14,6 @@
 #'   but rather use the `TENxParquet` constructor function to create an object
 #'   of either [TENxSpatialParquet] or [TENxMappingParquet] class in the
 #'   background.
-#'
-#' @slot colnames `character()` A vector specifying the column names of the
-#'  Parquet to import.
 #'
 #' @importClassesFrom TENxIO TENxFile
 #' @importFrom methods new is
@@ -30,7 +27,7 @@
     )
 )
 
-#' @rdname TENxParquet
+#' @rdname TENxParquet-class
 #'
 #' @inheritParams TENxIO::TENxFile
 #'
@@ -73,7 +70,7 @@ TENxParquet <- function(resource, type = c("spatial", "mapping")) {
     CFUN(resource)
 }
 
-#' @rdname TENxParquet
+#' @rdname TENxParquet-class
 #'
 #' @description `TENxSpatialParquet` is a class to represent and import spatial
 #'   Parquet files from 10X Genomics. It is a composed class of
@@ -85,7 +82,7 @@ TENxParquet <- function(resource, type = c("spatial", "mapping")) {
     contains = "TENxParquet"
 )
 
-#' @rdname TENxParquet
+#' @rdname TENxParquet-class
 #'
 #' @inheritParams TENxIO::TENxFile
 #' @inheritParams TENxSpatialParquet
@@ -116,7 +113,7 @@ TENxMappingParquet <- function(resource, colnames = .MAPPING_POS_COLS) {
     )
 }
 
-#' @rdname TENxParquet
+#' @rdname TENxParquet-class
 #'
 #' @exportMethod import
 setMethod("import", "TENxMappingParquet", function(con, format, text, ...) {
