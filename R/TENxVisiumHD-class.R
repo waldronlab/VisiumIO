@@ -183,14 +183,21 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'   directory
 #'
 #' @param boundary `character(1)` The type of segmentation boundary to use. The
-#'   options are `"cell_segmentations"` (default) or `"nucleus_segmentations"`.
+#'   options are `"cell_segmentations"` (default), `"nucleus_segmentations"`, or
+#'   "`both"`. When `"both"` is specified, `"cell_segmentations"` are added to
+#'   the `spatialCoords` and the `nucleus_segmentations` centroids (labeled
+#'   `x.nuc` and `y.nuc`) are added to the `colData` of the returned object.
 #'
 #' @param bin_size `character(1)` The bin size of the images to import. The
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.
 #'
-#' @examples
+#' @details Note that `nucleus_segmentations.geojson` file must be in the same
+#'   folder as the `cell_segmentations.geojson` file for the nucleus centroids
+#'   to be imported correctly when selecting the `"both"` for the `boundary`
+#'   argument.
 #'
+#' @examples
 #' vdir <- system.file(
 #'     "extdata", package = "VisiumIO", mustWork = TRUE
 #' )
@@ -269,7 +276,7 @@ TENxVisiumHD <- function(
     tissuePattern = "tissue_positions\\.parquet",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
     mappingPattern = "barcode_mappings\\.parquet",
-    boundary = c("cell_segmentations", "nucleus_segmentations"),
+    boundary = c("cell_segmentations", "nucleus_segmentations", "both"),
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -278,6 +285,8 @@ TENxVisiumHD <- function(
         if (missing(bin_size)) NULL else match.arg(bin_size)
     format <- match.arg(format)
     boundary <- match.arg(boundary)
+    boundaries <-
+        if (identical(boundary, "both")) "cell_segmentations" else boundary
     cellseg <- FALSE
     geojson <- NULL
 
@@ -314,7 +323,7 @@ TENxVisiumHD <- function(
             tissuePattern <- bin_size <- NULL
             geojson <- TENxGeoJSON(
                 file.path(
-                    segmented_outputs, paste0(boundary, ".geojson")
+                    segmented_outputs, paste0(boundaries, ".geojson")
                 )
             )
             data_folder <- segmented_outputs
@@ -392,12 +401,32 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     .import_fun(con)
 })
 
+.import_nuc <- function(con, sce) {
+    nuc_data <-
+        path(con@geojson) |>
+        gsub("cell_", "nucleus_", x = _, TRUE) |>
+        TENxGeoJSON() |>
+        import() |>
+        .repair_cell_ids(colnames(sce)) |>
+        sf::st_centroid()
+
+    nuc_data <- nuc_data[match(colnames(sce), nuc_data[["cell_id"]]), ]
+    coords <- sf::st_coordinates(nuc_data)
+    colnames(coords) <- c("x.nuc", "y.nuc")
+    if (identical(colnames(sce), nuc_data[["cell_id"]]))
+        colData(sce) <- cbind(colData(sce), coords)
+    sce
+}
+
 .import_cellseg <- function(con) {
     checkInstalled("sf")
 
     sce <- import(con@resources)
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]
+
+    if (identical(con@boundary, "both"))
+        sce <- .import_nuc(con, sce)
 
     geo_data <- import(con@geojson)
     geo_data <- .repair_cell_ids(geo_data, colnames(sce))

@@ -22,7 +22,7 @@ TENxVisiumHD(
   tissuePattern = "tissue_positions\\\\.parquet",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
   mappingPattern = "barcode_mappings\\\\.parquet",
-  boundary = c("cell_segmentations", "nucleus_segmentations"),
+  boundary = c("cell_segmentations", "nucleus_segmentations", "both"),
   ...
 )
 
@@ -71,7 +71,10 @@ to match the tissue positions file.}
 names of the columns in the spatial data containing the spatial coordinates.}
 
 \item{boundary}{\code{character(1)} The type of segmentation boundary to use. The
-options are \code{"cell_segmentations"} (default) or \code{"nucleus_segmentations"}.}
+options are \code{"cell_segmentations"} (default), \code{"nucleus_segmentations"}, or
+"\verb{both"}. When \code{"both"} is specified, \code{"cell_segmentations"} are added to
+the \code{spatialCoords} and the \code{nucleus_segmentations} centroids (labeled
+\code{x.nuc} and \code{y.nuc}) are added to the \code{colData} of the returned object.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
@@ -102,6 +105,11 @@ Typically, the user will provide a path to a directory containing
 the output of the \verb{spaceranger count} command. The \verb{spaceranger count}
 command outputs a folder containing the "raw" or "filtered"
 \verb{()_feature_bc_matrix}.
+
+Note that \code{nucleus_segmentations.geojson} file must be in the same
+folder as the \code{cell_segmentations.geojson} file for the nucleus centroids
+to be imported correctly when selecting the \code{"both"} for the \code{boundary}
+argument.
 }
 \section{Functions}{
 \itemize{
@@ -116,7 +124,6 @@ mapping data.}
 }}
 
 \examples{
-
 vdir <- system.file(
     "extdata", package = "VisiumIO", mustWork = TRUE
 )
