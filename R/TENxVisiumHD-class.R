@@ -192,6 +192,9 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'   default is `008`. It corresponds to the directory name `square_000um` where
 #'   `000` is the bin value.
 #'
+#' @param mappingPattern `character(1)` The `pattern` used in `list.files` that
+#'   identifies the mapping file. The default is `"barcode_mappings\\.parquet"`.
+#'
 #' @details Note that `nucleus_segmentations.geojson` file must be in the same
 #'   folder as the `cell_segmentations.geojson` file for the nucleus centroids
 #'   to be imported correctly when selecting the `"both"` for the `boundary`

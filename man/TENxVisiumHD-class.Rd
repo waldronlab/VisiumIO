@@ -70,6 +70,9 @@ to match the tissue positions file.}
 \item{spatialCoordsNames}{\code{character()} A vector of strings specifying the
 names of the columns in the spatial data containing the spatial coordinates.}
 
+\item{mappingPattern}{\code{character(1)} The \code{pattern} used in \code{list.files} that
+identifies the mapping file. The default is \code{"barcode_mappings\\\\.parquet"}.}
+
 \item{boundary}{\code{character(1)} The type of segmentation boundary to use. The
 options are \code{"cell_segmentations"} (default), \code{"nucleus_segmentations"}, or
 "\verb{both"}. When \code{"both"} is specified, \code{"cell_segmentations"} are added to
