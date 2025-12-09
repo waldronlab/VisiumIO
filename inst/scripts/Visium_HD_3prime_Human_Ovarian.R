@@ -3,8 +3,11 @@
 ## https://www.10xgenomics.com/datasets/visium-hd-three-prime-ovarian-cancer-fresh-frozen
 
 library(sf)
+
+# cell segmentations ------------------------------------------------------
 cseg <- file.path(
     "~/data",
+    "Visium_HD_3prime_Human_Ovarian_Cancer",
     "Visium_HD_3prime_Human_Ovarian_Cancer_segmented_outputs",
     "segmented_outputs",
     "cell_segmentations.geojson"
@@ -20,6 +23,31 @@ st_write(
         "inst", "extdata", "segmented_outputs", "cell_segmentations.geojson"
     )
 )
+
+# TENxGeoJSON("inst/extdata/segmented_outputs/cell_segmentations.geojson") |>
+#     import()
+
+# nucleus segmentations ---------------------------------------------------
+nseg <- file.path(
+    "~/data",
+    "Visium_HD_3prime_Human_Ovarian_Cancer",
+    "Visium_HD_3prime_Human_Ovarian_Cancer_segmented_outputs",
+    "segmented_outputs",
+    "nucleus_segmentations.geojson"
+)
+geo_data <- st_read(dsn = nseg, quiet = TRUE, stringsAsFactors = FALSE)
+st_crs(geo_data) <- NA
+rownames(geo_data) <- geo_data[["cell_id"]]
+geo_data <- geo_data[1:2, ]
+st_write(
+    geo_data,
+    dsn <- file.path(
+        "inst", "extdata", "segmented_outputs", "nucleus_segmentations.geojson"
+    )
+)
+
+# TENxGeoJSON("inst/extdata/segmented_outputs/nucleus_segmentations.geojson") |>
+#     import()
 
 # Write smaller H5 file for examples --------------------------------------
 
