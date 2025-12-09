@@ -1,6 +1,7 @@
 ##  Prepare smaller example files from the
 ## Visium_HD_3prime_Human_Ovarian_Cancer_segmented_outputs
-## https://www.10xgenomics.com/datasets/visium-hd-three-prime-ovarian-cancer-fresh-frozen
+## https://www.10xgenomics.com/datasets/
+## visium-hd-three-prime-ovarian-cancer-fresh-frozen
 
 library(sf)
 
@@ -56,6 +57,7 @@ library(HDF5Array)
 
 h5f <- file.path(
     "~/data",
+    "Visium_HD_3prime_Human_Ovarian_Cancer",
     "Visium_HD_3prime_Human_Ovarian_Cancer_segmented_outputs",
     "segmented_outputs",
     "filtered_feature_cell_matrix.h5"
@@ -87,10 +89,12 @@ h5write(h4, h5new, "/matrix/features/name")
 TENxH5(h5new)
 file.info(h5new)$size
 
+# Write smaller barcode_mappings.parquet ----------------------------------
+
 park <- arrow::read_parquet(
     file.path(
         "~/data",
-        "visium-hd-three-prime-ovarian-cancer-fresh-frozen",
+        "Visium_HD_3prime_Human_Ovarian_Cancer",
         "Visium_HD_3prime_Human_Ovarian_Cancer_barcode_mappings.parquet"
     )
 )
