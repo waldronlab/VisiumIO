@@ -51,12 +51,20 @@ segout_folder <- system.file(
     file.path("extdata", "segmented_outputs"),
     package = "VisiumIO"
 )
-geojsonres <- file.path(segout_folder, "cell_segmentations.geojson")
 
-TENxGeoJSON(geojsonres)
+## import cell boundaries
+cellsegs <- file.path(segout_folder, "cell_segmentations.geojson")
 
-TENxGeoJSON(geojsonres) |>
-  import()
+TENxGeoJSON(cellsegs)
+
+TENxGeoJSON(cellsegs) |>
+    import()
+
+## import nucleus boundaries
+nucsegs <- file.path(segout_folder, "nucleus_segmentations.geojson")
+
+TENxGeoJSON(nucsegs) |>
+    import()
 }
 \seealso{
 \url{https://www.10xgenomics.com/support/software/xenium-ranger/3.0/analysis/segmentation-inputs}
