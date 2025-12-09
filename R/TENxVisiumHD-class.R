@@ -22,9 +22,6 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'
 #' @inheritParams TENxVisiumList-class
 #'
-#' @slot mapping A [TENxMappingParquet] object or `NULL` containing the barcode
-#'   mapping data.
-#'
 #' @return A [SpatialExperiment][SpatialExperiment::SpatialExperiment-class]
 #'   object
 #'

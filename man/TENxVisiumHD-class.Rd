@@ -119,13 +119,6 @@ argument.
 \item \code{import(con = TENxVisiumHD, format = ANY, text = ANY)}: Import Visium HD data from multiple bin sizes
 
 }}
-\section{Slots}{
-
-\describe{
-\item{\code{mapping}}{A \link{TENxMappingParquet} object or \code{NULL} containing the barcode
-mapping data.}
-}}
-
 \examples{
 vdir <- system.file(
     "extdata", package = "VisiumIO", mustWork = TRUE
