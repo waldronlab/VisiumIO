@@ -8,7 +8,7 @@
 \alias{import,TENxSpatialParquet,ANY,ANY-method}
 \title{Represent and import spatial Parquet data from 10X Genomics}
 \usage{
-TENxSpatialParquet(resource, colnames = .TISSUE_POS_COLS)
+TENxSpatialParquet(resource, colnames)
 
 \S4method{import}{TENxSpatialParquet,ANY,ANY}(con, format, text, ...)
 }
@@ -16,7 +16,7 @@ TENxSpatialParquet(resource, colnames = .TISSUE_POS_COLS)
 \item{resource}{character(1) The path to the file}
 
 \item{colnames}{\code{character()} A vector specifying the column names of the
-Parquet, defaults to \code{c("barcode", "in_tissue", "array_row", "array_col", "pxl_row_in_fullres", "pxl_col_in_fullres")}.}
+Parquet, defaults to all columns in the dataset.}
 
 \item{con}{The connection from which data is loaded or to which data is
 saved. If this is a \code{character} vector, it is assumed to be a file name and

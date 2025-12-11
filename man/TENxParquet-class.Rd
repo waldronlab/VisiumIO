@@ -25,7 +25,7 @@ import, either "spatial" or "mapping". If not provided, the type is
 determined by whether or not there is a "mapping" keyword in the file name.}
 
 \item{colnames}{\code{character()} A vector specifying the column names of the
-Parquet, defaults to \code{c("barcode", "in_tissue", "array_row", "array_col", "pxl_row_in_fullres", "pxl_col_in_fullres")}.}
+Parquet, defaults to all columns in the dataset.}
 
 \item{con}{The connection from which data is loaded or to which data is
 saved. If this is a \code{character} vector, it is assumed to be a file name and

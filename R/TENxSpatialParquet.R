@@ -26,8 +26,7 @@
 #' @inheritParams TENxIO::TENxFile
 #'
 #' @param colnames `character()` A vector specifying the column names of the
-#'   Parquet, defaults to `c("barcode", "in_tissue", "array_row", "array_col",
-#'   "pxl_row_in_fullres", "pxl_col_in_fullres")`.
+#'   Parquet, defaults to all columns in the dataset.
 #'
 #' @return `TENxSpatialParquet()`: An object of class [TENxSpatialParquet]
 #'
@@ -50,11 +49,13 @@
 #'     attr("metadata") |>
 #'     lapply(names)
 #' @export
-TENxSpatialParquet <- function(resource, colnames = .TISSUE_POS_COLS) {
+TENxSpatialParquet <- function(resource, colnames) {
     if (!is(resource, "TENxFile"))
         resource <- TENxFile(resource)
     checkInstalled("arrow")
     cnames <- names(arrow::open_dataset(path(resource)))
+    if (missing(colnames))
+        colnames <- cnames
     if (!all(colnames %in% cnames)) {
         warning(
             "The provided column names do not match all in the Parquet file.",
