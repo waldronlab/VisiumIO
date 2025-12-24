@@ -35,6 +35,11 @@ expect_identical(
     rownames(rowData(spe)), rowData(spe)[["ID"]]
 )
 
+expect_identical(
+    SpatialExperiment::spatialCoordsNames(spe),
+    c("pxl_col_in_fullres", "pxl_row_in_fullres")
+)
+
 # test segmented_outputs input --------------------------------------------
 
 library(sf)

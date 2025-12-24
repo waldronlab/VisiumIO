@@ -509,6 +509,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         altExps = altExps(sce),
         sample_id = con@sampleId,
         colData = colData(sce),
+        spatialCoordsNames = con@coordNames,
         imgData = img,
         metadata = list(
             resouces = metadata(sce),
