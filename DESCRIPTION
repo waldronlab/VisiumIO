@@ -2,13 +2,14 @@ Package: VisiumIO
 Title: Import Visium data from the 10X Space Ranger pipeline
 Version: 1.7.6
 Authors@R: c(
-    person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu",
-        c("aut", "cre"), c(ORCID = "0000-0002-3242-0582")
-    ),
+    person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3242-0582")),
     person("Estella YiXing", "Dong", role = c("aut", "ctb")),
     person("Dario", "Righelli", role = c("aut", "ctb")),
-    person("Helena", "Crowell", role = c("aut", "ctb"))
-    )
+    person("Helena", "Crowell", role = c("aut", "ctb")),
+    person("NCI", role = "fnd",
+           comment = c(GrantNo. = "U24CA289073"))
+  )
 Description: The package allows users to readily import spatial data obtained
     from either the 10X website or from the Space Ranger pipeline.
     Supported formats include tar.gz, h5, and mtx files. Multiple files
