@@ -13,7 +13,10 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #' @description This class contains a `SimpleList` of [TENxVisiumHD] objects
 #'   each corresponding to one sample. The provided `spacerangerOut` folder
 #'   should contain a `binned_outputs` folder where multiple `bin_size`
-#'   subfolders are present, e.g., `square_002um`.
+#'   subfolders are present, e.g., `square_002um`. Note that the `sf` package
+#'   is required to import cell segmentation and nucleus segmentation data. If
+#'   the `sf` package is not installed, the cell segmentation data will not be
+#'   imported and an error is issued.
 #'
 #' @details Typically, the user will provide a path to a directory containing
 #'  the output of the `spaceranger count` command. The `spaceranger count`

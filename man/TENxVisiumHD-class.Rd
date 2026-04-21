@@ -101,7 +101,10 @@ object
 This class contains a \code{SimpleList} of \link{TENxVisiumHD} objects
 each corresponding to one sample. The provided \code{spacerangerOut} folder
 should contain a \code{binned_outputs} folder where multiple \code{bin_size}
-subfolders are present, e.g., \code{square_002um}.
+subfolders are present, e.g., \code{square_002um}. Note that the \code{sf} package
+is required to import cell segmentation and nucleus segmentation data. If
+the \code{sf} package is not installed, the cell segmentation data will not be
+imported and an error is issued.
 }
 \details{
 Typically, the user will provide a path to a directory containing
