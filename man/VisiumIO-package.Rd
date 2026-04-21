@@ -26,5 +26,10 @@ Authors:
   \item Helena Crowell [contributor]
 }
 
+Other contributors:
+\itemize{
+  \item NCI (U24CA289073) [funder]
+}
+
 }
 \keyword{internal}
