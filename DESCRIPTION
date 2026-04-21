@@ -1,6 +1,6 @@
 Package: VisiumIO
 Title: Import Visium data from the 10X Space Ranger pipeline
-Version: 1.7.7
+Version: 1.7.8
 Authors@R: c(
     person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3242-0582")),
