@@ -24,6 +24,7 @@ Imports:
     jsonlite,
     methods,
     S4Vectors,
+    sf,
     SingleCellExperiment,
     SpatialExperiment,
     SummarizedExperiment
@@ -34,7 +35,6 @@ Suggests:
     knitr,
     readr,
     rmarkdown,
-    sf,
     tinytest
 biocViews: Software, Infrastructure, DataImport, SingleCell, Spatial
 VignetteBuilder: knitr

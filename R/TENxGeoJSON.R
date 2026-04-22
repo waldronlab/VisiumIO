@@ -62,7 +62,6 @@ TENxGeoJSON <- function(resource) {
 #'
 #' @exportMethod import
 setMethod("import", "TENxGeoJSON", function(con, format, text, ...) {
-    checkInstalled("sf")
     geo_data <- sf::st_read(
         dsn = path(con),
         quiet = TRUE,

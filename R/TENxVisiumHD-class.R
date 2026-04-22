@@ -422,8 +422,6 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
 }
 
 .import_cellseg <- function(con) {
-    checkInstalled("sf")
-
     sce <- import(con@resources)
     slist <- import(con@spatialList)
     img <- slist[["imgData"]]

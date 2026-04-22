@@ -208,7 +208,6 @@ compareBarcodes <- function(
 #' )
 #' @export
 st_invert_y <- function(sf, type = c("POINT", "POLYGON"), img_height, scalef) {
-    checkInstalled("sf")
     type <- match.arg(type)
     stopifnot(
         isScalarNumber(img_height), isScalarNumber(scalef)
