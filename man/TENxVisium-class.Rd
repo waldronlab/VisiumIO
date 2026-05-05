@@ -19,6 +19,7 @@ TENxVisium(
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*\\\\.csv",
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+  loadImage = FALSE,
   ...
 )
 
@@ -58,6 +59,9 @@ to match the tissue positions file.}
 
 \item{spatialCoordsNames}{\code{character()} A vector of strings specifying the
 names of the columns in the spatial data containing the spatial coordinates.}
+
+\item{loadImage}{\code{logical(1)} A single logical value indicating whether to
+load the image data into the resulting \code{SpatialExperiment} object.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
@@ -108,6 +112,9 @@ arguments are paths to files.
 of the columns in the spatial data containing the spatial coordinates.}
 
 \item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
+
+\item{\code{loadImage}}{\code{logical(1)} A scalar logical indicating whether to load the
+image data into the resulting \code{SpatialExperiment} object.}
 }}
 
 \examples{

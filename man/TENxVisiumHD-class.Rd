@@ -23,6 +23,7 @@ TENxVisiumHD(
   spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
   mappingPattern = "barcode_mappings\\\\.parquet",
   boundary = c("cell_segmentations", "nucleus_segmentations", "both"),
+  loadImage = FALSE,
   ...
 )
 
@@ -78,6 +79,9 @@ options are \code{"cell_segmentations"} (default), \code{"nucleus_segmentations"
 "\verb{both"}. When \code{"both"} is specified, \code{"cell_segmentations"} are added to
 the \code{spatialCoords} and the \code{nucleus_segmentations} centroids (labeled
 \code{x.nuc} and \code{y.nuc}) are added to the \code{colData} of the returned object.}
+
+\item{loadImage}{\code{logical(1)} A single logical value indicating whether to
+load the image data into the resulting \code{SpatialExperiment} object.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}

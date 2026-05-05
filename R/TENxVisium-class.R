@@ -26,6 +26,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' @slot sampleId `character(1)` A scalar specifying the sample identifier.
 #'
+#' @slot loadImage `logical(1)` A scalar logical indicating whether to load the
+#'   image data into the resulting `SpatialExperiment` object.
+#'
 #' @return A [SpatialExperiment][SpatialExperiment::SpatialExperiment-class]
 #'   object
 #'
@@ -38,7 +41,8 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
         resources = "TENxFileList_OR_TENxH5",
         spatialList = "TENxSpatialList",
         coordNames = "character",
-        sampleId = "character"
+        sampleId = "character",
+        loadImage = "logical"
     )
 )
 
@@ -129,6 +133,9 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #' @param spatialCoordsNames `character()` A vector of strings specifying the
 #'  names of the columns in the spatial data containing the spatial coordinates.
 #'
+#' @param loadImage `logical(1)` A single logical value indicating whether to
+#'   load the image data into the resulting `SpatialExperiment` object.
+#'
 #' @param ... In the constructor, additional arguments passed to
 #'   [TENxFileList][TENxIO::TENxFileList-class]; otherwise, not used.
 #'
@@ -197,6 +204,7 @@ TENxVisium <- function(
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*\\.csv",
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
+    loadImage = FALSE,
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -247,7 +255,8 @@ TENxVisium <- function(
         resources = resources,
         spatialList = spatialResource,
         coordNames = spatialCoordsNames,
-        sampleId = sample_id
+        sampleId = sample_id,
+        loadImage = loadImage
     )
 }
 
@@ -313,6 +322,7 @@ setMethod("import", "TENxVisium", function(con, format, text, ...) {
         colData = as(spd, "DataFrame"),
         spatialCoordsNames = con@coordNames,
         imgData = img,
+        loadImage = con@loadImage,
         metadata = list(
             resources = metadata(sce),
             spatialList = metadata(con@spatialList)

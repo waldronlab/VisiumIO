@@ -280,6 +280,7 @@ TENxVisiumHD <- function(
     spatialCoordsNames = c("pxl_col_in_fullres", "pxl_row_in_fullres"),
     mappingPattern = "barcode_mappings\\.parquet",
     boundary = c("cell_segmentations", "nucleus_segmentations", "both"),
+    loadImage = FALSE,
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -372,6 +373,7 @@ TENxVisiumHD <- function(
         tissuePattern = tissuePattern,
         spatialCoordsNames = spatialCoordsNames,
         mappingPattern = mappingPattern,
+        loadImage = loadImage,
         ...
     )
 
@@ -450,6 +452,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         colData = colData(sce),
         spatialCoords = coords,
         imgData = img,
+        loadImage = con@loadImage,
         metadata = list(
             resouces = metadata(sce),
             spatialList = metadata(con@spatialList),
@@ -512,6 +515,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         colData = colData(sce),
         spatialCoordsNames = con@coordNames,
         imgData = img,
+        loadImage = con@loadImage,
         metadata = list(
             resouces = metadata(sce),
             spatialList = metadata(con@spatialList)
