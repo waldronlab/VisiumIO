@@ -101,3 +101,28 @@ expect_error(
     )
 )
 
+# loadImage tests ---------------------------------------------------------
+
+tv_no_load <- TENxVisium(
+    spacerangerOut = outs_dir, processing = "raw", images = "lowres",
+    loadImage = FALSE
+)
+expect_false(tv_no_load@loadImage)
+
+spe_no_load <- import(tv_no_load)
+img_no_load <- SpatialExperiment::imgData(spe_no_load)$data[[1L]]
+expect_true(
+    is(img_no_load, "StoredSpatialImage")
+)
+
+tv_load <- TENxVisium(
+    spacerangerOut = outs_dir, processing = "raw", images = "lowres",
+    loadImage = TRUE
+)
+expect_true(tv_load@loadImage)
+
+spe_load <- import(tv_load)
+img_load <- SpatialExperiment::imgData(spe_load)$data[[1L]]
+expect_true(
+    is(img_load, "LoadedSpatialImage")
+)

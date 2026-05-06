@@ -40,6 +40,36 @@ expect_identical(
     c("pxl_col_in_fullres", "pxl_row_in_fullres")
 )
 
+# loadImage tests ---------------------------------------------------------
+
+tvh_no_load <- TENxVisiumHD(
+    spacerangerOut = sample_dir, bin_size = "002", images = "lowres",
+    loadImage = FALSE
+)
+expect_false(
+    tvh_no_load@loadImage
+)
+
+speh_no_load <- import(tvh_no_load)
+imgh_no_load <- SpatialExperiment::imgData(speh_no_load)$data[[1L]]
+expect_true(
+    is(imgh_no_load, "StoredSpatialImage")
+)
+
+tvh_load <- TENxVisiumHD(
+    spacerangerOut = sample_dir, bin_size = "002", images = "lowres",
+    loadImage = TRUE
+)
+expect_true(
+    tvh_load@loadImage
+)
+
+speh_load <- import(tvh_load)
+imgh_load <- SpatialExperiment::imgData(speh_load)$data[[1]]
+expect_true(
+    is(imgh_load, "LoadedSpatialImage")
+)
+
 # test segmented_outputs input --------------------------------------------
 
 library(sf)
