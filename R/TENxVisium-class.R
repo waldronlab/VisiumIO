@@ -26,8 +26,11 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'
 #' @slot sampleId `character(1)` A scalar specifying the sample identifier.
 #'
-#' @slot loadImage `logical(1)` A scalar logical indicating whether to load the
-#'   image data into the resulting `SpatialExperiment` object.
+#' @slot loadImage `logical(1)` Whether to load the images into memory as
+#'   `SpatialImage` objects. If `FALSE`, the images are stored as file paths and
+#'   loaded as `StoredSpatialImage` objects when the `TENxSpatialList` object is
+#'   imported. The default is `FALSE` to avoid loading large images into memory.
+#'   This functionality requires the `magick` package.
 #'
 #' @return A [SpatialExperiment][SpatialExperiment::SpatialExperiment-class]
 #'   object
@@ -134,7 +137,8 @@ setClassUnion("TENxFileList_OR_TENxH5", members = c("TENxFileList", "TENxH5"))
 #'  names of the columns in the spatial data containing the spatial coordinates.
 #'
 #' @param loadImage `logical(1)` A single logical value indicating whether to
-#'   load the image data into the resulting `SpatialExperiment` object.
+#'   load the image data into the resulting `SpatialExperiment` object. This
+#'   argument requires the `magick` package.
 #'
 #' @param ... In the constructor, additional arguments passed to
 #'   [TENxFileList][TENxIO::TENxFileList-class]; otherwise, not used.
@@ -224,7 +228,8 @@ TENxVisium <- function(
             sample_id = sample_id,
             images = images,
             jsonFile = jsonFile,
-            tissuePattern = tissuePattern
+            tissuePattern = tissuePattern,
+            loadImage = loadImage
         )
     } else {
         stopifnot(
@@ -247,7 +252,8 @@ TENxVisium <- function(
                 sample_id = sample_id,
                 images = images,
                 jsonFile = jsonFile,
-                tissuePattern = tissuePattern
+                tissuePattern = tissuePattern,
+                loadImage = loadImage
             )
     }
 

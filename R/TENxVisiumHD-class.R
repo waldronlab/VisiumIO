@@ -316,7 +316,8 @@ TENxVisiumHD <- function(
                 sample_id = sample_id,
                 images = images,
                 jsonFile = jsonFile,
-                tissuePattern = tissuePattern
+                tissuePattern = tissuePattern,
+                loadImage = loadImage
             )
     } else {
         if (!missing(segmented_outputs)) {
@@ -355,7 +356,8 @@ TENxVisiumHD <- function(
             sample_id = sample_id,
             images = images,
             jsonFile = jsonFile,
-            tissuePattern = tissuePattern
+            tissuePattern = tissuePattern,
+            loadImage = loadImage
         )
     }
     mapping <- .find_convert_maps(

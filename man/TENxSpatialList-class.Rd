@@ -15,6 +15,7 @@ TENxSpatialList(
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
   bin_size = character(0L),
+  loadImage = FALSE,
   ...
 )
 
@@ -38,6 +39,10 @@ to match the tissue positions file.}
 \item{bin_size}{\code{character(1)} The bin size of the images to import. The
 default is \code{008}. It corresponds to the directory name \code{square_000um} where
 \code{000} is the bin value.}
+
+\item{loadImage}{\code{logical(1)} A single logical value indicating whether to
+load the image data into the resulting \code{SpatialExperiment} object. This
+argument requires the \code{magick} package.}
 
 \item{...}{Parameters to pass to the format-specific method.}
 
@@ -93,6 +98,12 @@ typically a \code{.parquet} or \code{.csv} file.}
 \item{\code{binSize}}{The bin size of the images to import. The default slot value is
 \code{character()}. It typically corresponds to the directory name
 \code{square_000um} where \code{000} is the bin value.}
+
+\item{\code{loadImage}}{\code{logical(1)} Whether to load the images into memory as
+\code{SpatialImage} objects. If \code{FALSE}, the images are stored as file paths and
+loaded as \code{StoredSpatialImage} objects when the \code{TENxSpatialList} object is
+imported. The default is \code{FALSE} to avoid loading large images into memory.
+This functionality requires the \code{magick} package.}
 }}
 
 \examples{

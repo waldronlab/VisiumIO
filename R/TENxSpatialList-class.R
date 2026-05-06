@@ -31,6 +31,12 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'   `character()`. It typically corresponds to the directory name
 #'   `square_000um` where `000` is the bin value.
 #'
+#' @slot loadImage `logical(1)` Whether to load the images into memory as
+#'   `SpatialImage` objects. If `FALSE`, the images are stored as file paths and
+#'   loaded as `StoredSpatialImage` objects when the `TENxSpatialList` object is
+#'   imported. The default is `FALSE` to avoid loading large images into memory.
+#'   This functionality requires the `magick` package.
+#'
 #' @exportClass TENxSpatialList
 .TENxSpatialList <- setClass(
     "TENxSpatialList",
@@ -40,7 +46,8 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
         scaleJSON = "character",
         tissuePos = "character_OR_NULL",
         sampleId = "character",
-        binSize = "character"
+        binSize = "character",
+        loadImage = "logical"
     )
 )
 
@@ -106,6 +113,7 @@ TENxSpatialList <- function(
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
     bin_size = character(0L),
+    loadImage = FALSE,
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
@@ -133,7 +141,7 @@ TENxSpatialList <- function(
     .TENxSpatialList(
         resources, images = images, scaleJSON = jsonFile,
         tissuePos = tissuePos, sampleId = sample_id,
-        binSize = bin_size
+        binSize = bin_size, loadImage = loadImage
     )
 }
 
@@ -186,7 +194,15 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
             "The '", image, "' image was not found in the list of file names.",
             call. = FALSE
         )
-    spi <- SpatialExperiment::SpatialImage(imgPath)
+    img <- imgPath
+
+    if (con@loadImage) {
+        checkInstalled("magick")
+        img <- magick::image_read(imgPath) |> grDevices::as.raster()
+    }
+
+    spi <- SpatialExperiment::SpatialImage(img)
+
     if (identical(image, "cytassist"))
         image <- "regist_target"
     scaleName <- grep(image, names(scaleFx), value = TRUE)

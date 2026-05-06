@@ -33,6 +33,7 @@ Suggests:
     BiocStyle,
     data.table,
     knitr,
+    magick,
     readr,
     rmarkdown,
     tinytest

@@ -61,7 +61,8 @@ to match the tissue positions file.}
 names of the columns in the spatial data containing the spatial coordinates.}
 
 \item{loadImage}{\code{logical(1)} A single logical value indicating whether to
-load the image data into the resulting \code{SpatialExperiment} object.}
+load the image data into the resulting \code{SpatialExperiment} object. This
+argument requires the \code{magick} package.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
@@ -113,8 +114,11 @@ of the columns in the spatial data containing the spatial coordinates.}
 
 \item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
 
-\item{\code{loadImage}}{\code{logical(1)} A scalar logical indicating whether to load the
-image data into the resulting \code{SpatialExperiment} object.}
+\item{\code{loadImage}}{\code{logical(1)} Whether to load the images into memory as
+\code{SpatialImage} objects. If \code{FALSE}, the images are stored as file paths and
+loaded as \code{StoredSpatialImage} objects when the \code{TENxSpatialList} object is
+imported. The default is \code{FALSE} to avoid loading large images into memory.
+This functionality requires the \code{magick} package.}
 }}
 
 \examples{

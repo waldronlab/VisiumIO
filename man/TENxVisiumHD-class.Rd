@@ -81,7 +81,8 @@ the \code{spatialCoords} and the \code{nucleus_segmentations} centroids (labeled
 \code{x.nuc} and \code{y.nuc}) are added to the \code{colData} of the returned object.}
 
 \item{loadImage}{\code{logical(1)} A single logical value indicating whether to
-load the image data into the resulting \code{SpatialExperiment} object.}
+load the image data into the resulting \code{SpatialExperiment} object. This
+argument requires the \code{magick} package.}
 
 \item{...}{In the constructor, additional arguments passed to
 \link[TENxIO:TENxFileList-class]{TENxFileList}; otherwise, not used.}
