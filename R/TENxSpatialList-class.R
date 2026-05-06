@@ -159,9 +159,13 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
     sampid <- con@sampleId
     sfs <- jsonlite::fromJSON(txt = path(con)[jsonFile])
 
-    DFs <- lapply(con@images, function(image) {
-        .getImgRow(con = con, sampleId = sampid, image = image, scaleFx = sfs)
-    })
+    DFs <- lapply(
+        X = con@images,
+        FUN = .getImgRow,
+        con = con,
+        sampleId = sampid,
+        scaleFx = sfs
+    )
     res <- list(
         imgData = DataFrame(
             do.call(rbind, DFs)
