@@ -128,6 +128,13 @@ TENxSpatialList <- function(
     ...
 ) {
     images <- match.arg(images, several.ok = TRUE)
+    if (!missing(bin_size)) {
+        if (!isScalarCharacter(bin_size, zchar = TRUE))
+            stop("The 'bin_size' argument must be a single character value.")
+        if (nzchar(bin_size) && !grepl("^\\d{3}$", bin_size))
+            stop("The 'bin_size' argument must be a 3-digit string.")
+    }
+
     if (!is(resources, "TENxFileList"))
         resources <- TENxFileList(resources, ...)
     if (resources@compressed)
@@ -147,9 +154,8 @@ TENxSpatialList <- function(
         )
     else if (missing(bin_size))
         bin_size <- ""
-    else if (!isScalarCharacter(bin_size, zchar = TRUE))
-        stop("The 'bin_size' argument must be a single character value.")
-    else if (!bin_size %in% c("002", "008", "016"))
+
+    if (nzchar(bin_size) && !bin_size %in% c("002", "008", "016"))
         message("Using custom 'bin_size': ", bin_size)
 
     .TENxSpatialList(
