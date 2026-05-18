@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Marcel Ramos \email{marcel.ramos@sph.cuny.edu} (\href{https://orcid.org/0000-0002-3242-0582}{ORCID})
   \item Estella YiXing Dong [contributor]
   \item Dario Righelli [contributor]
   \item Helena Crowell [contributor]
@@ -28,7 +29,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item NCI (U24CA289073) [funder]
+  \item NCI (GrantNo.: U24CA289073) [funder]
 }
 
 }

@@ -79,7 +79,7 @@ to a connection.}
 providing the string data to import.}
 }
 \value{
-A \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment}
+A \link[SpatialExperiment:SpatialExperiment-class]{SpatialExperiment}
 object
 }
 \description{
