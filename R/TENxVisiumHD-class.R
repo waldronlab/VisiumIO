@@ -344,8 +344,7 @@ TENxVisiumHD <- function(
                 isScalarCharacter(segmented_outputs),
                 dir.exists(segmented_outputs)
             )
-            tissuePattern <- NULL
-            bin_size <- ""
+            tissuePattern <- bin_size <- ""
             geojson <- TENxGeoJSON(
                 file.path(
                     segmented_outputs, paste0(boundaries, ".geojson")

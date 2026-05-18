@@ -1,5 +1,3 @@
-setClassUnion("character_OR_NULL", c("character", "NULL"))
-
 #' @docType class
 #'
 #' @title A class to represent and import spatial Visium data
@@ -22,8 +20,9 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #' @slot scaleJSON `character(1)` The file name of the scale factors JSON file,
 #'   defaults to 'scalefactors_json.json'.
 #'
-#' @slot tissuePos `character(1)` The file name of the tissue positions file;
-#'   typically a `.parquet` or `.csv` file.
+#' @slot tissuePos `character(1)` An optional slot indicating the file name of
+#'   the tissue positions file; typically a `.parquet` or `.csv` file. To avoid
+#'   import, this slot can be set to an empty character value i.e., `""`.
 #'
 #' @slot sampleId `character(1)` A scalar specifying the sample identifier.
 #'
@@ -45,7 +44,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
     slots = c(
         images = "character",
         scaleJSON = "character",
-        tissuePos = "character_OR_NULL",
+        tissuePos = "character",
         sampleId = "character",
         binSize = "character",
         loadImage = "logical"
@@ -69,7 +68,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 
 .validTENxSpatialList <- function(object) {
     c(
-        if (!is.null(object@tissuePos))
+        if (nzchar(object@tissuePos))
             .check_file_pattern(object, "tissue_positions.*"),
         .check_file_pattern(object, "scalefactors.*\\.json$"),
         .check_file(object, object@scaleJSON)
@@ -140,7 +139,7 @@ TENxSpatialList <- function(
     if (resources@compressed)
         resources <- decompress(con = resources)
     tissuePos <- tissuePattern
-    if (!is.null(tissuePattern)) {
+    if (nzchar(tissuePattern)) {
         tissuePos <- grep(tissuePattern, names(resources), value = TRUE)
         if (!length(tissuePos))
             stop(
@@ -191,7 +190,7 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
             do.call(rbind, DFs)
         )
     )
-    if (!is.null(con@tissuePos)) {
+    if (nzchar(con@tissuePos)) {
         fff <- FileForFormat(
             path(con)[con@tissuePos],
             prefix = "TENxSpatial", suffix = NULL

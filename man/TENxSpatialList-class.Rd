@@ -96,8 +96,9 @@ in the list of files. Can be one of "lowres", "hires",  "lowres", "hires",
 \item{\code{scaleJSON}}{\code{character(1)} The file name of the scale factors JSON file,
 defaults to 'scalefactors_json.json'.}
 
-\item{\code{tissuePos}}{\code{character(1)} The file name of the tissue positions file;
-typically a \code{.parquet} or \code{.csv} file.}
+\item{\code{tissuePos}}{\code{character(1)} An optional slot indicating the file name of
+the tissue positions file; typically a \code{.parquet} or \code{.csv} file. To avoid
+import, this slot can be set to an empty character value i.e., \code{""}.}
 
 \item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
 
