@@ -102,10 +102,10 @@ import, this slot can be set to an empty character value i.e., \code{""}.}
 
 \item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
 
-\item{\code{binSize}}{An optional slot to store the image bin size when importing.
-The default slot value is an empty character i.e., \code{""}. When present,
-the value must be a character scalar, e.g., \code{'008'} for 8 microns, and
-will match the directory name e.g., \code{square_008um}.}
+\item{\code{binSize}}{\code{character(1)} An optional slot to store the image bin size
+when importing. The default slot value is an empty character i.e., \code{""}.
+When present, the value must be a character scalar, e.g., \code{'008'} for 8
+microns, and will match the directory name e.g., \code{square_008um}.}
 
 \item{\code{loadImage}}{\code{logical(1)} Whether to load the images into memory as
 \code{SpatialImage} objects. If \code{FALSE}, the images are stored as file paths and

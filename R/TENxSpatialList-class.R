@@ -26,10 +26,10 @@
 #'
 #' @slot sampleId `character(1)` A scalar specifying the sample identifier.
 #'
-#' @slot binSize An optional slot to store the image bin size when importing.
-#'   The default slot value is an empty character i.e., `""`. When present,
-#'   the value must be a character scalar, e.g., `'008'` for 8 microns, and
-#'   will match the directory name e.g., `square_008um`.
+#' @slot binSize `character(1)` An optional slot to store the image bin size
+#'   when importing. The default slot value is an empty character i.e., `""`.
+#'   When present, the value must be a character scalar, e.g., `'008'` for 8
+#'   microns, and will match the directory name e.g., `square_008um`.
 #'
 #' @slot loadImage `logical(1)` Whether to load the images into memory as
 #'   `SpatialImage` objects. If `FALSE`, the images are stored as file paths and
