@@ -14,7 +14,7 @@ TENxSpatialList(
   images = c("lowres", "hires", "detected", "aligned", "aligned_fiducials", "cytassist"),
   jsonFile = .SCALE_JSON_FILE,
   tissuePattern = "tissue_positions.*",
-  bin_size = character(0L),
+  bin_size = c("008", "016", "002"),
   loadImage = FALSE,
   ...
 )
@@ -36,9 +36,15 @@ JSON file containing the scale factors.}
 \item{tissuePattern}{\code{character(1)} A single string specifying the pattern
 to match the tissue positions file.}
 
-\item{bin_size}{\code{character(1)} The bin size of the images to import. The
-default is \code{008}. It corresponds to the directory name \code{square_000um} where
-\code{000} is the bin value.}
+\item{bin_size}{\code{character(1)} An \emph{optional} scalar indicating the image bin
+size in microns, e.g., \code{'008'} for 8 microns. When provided, the function
+will look for a subfolder in the \code{binned_outputs} folder that corresponds
+to the specified bin size, e.g., \code{square_008um} for an input value of
+\code{'008'}. Bin sizes \code{'002'}, \code{'008'}, and \code{'016'} are typical of the space
+ranger pipeline but custom bin sizes may be used. If the \code{bin_size}
+argument is not provided, it is set to an empty character value i.e., \code{""}
+and the function will not look for any data in \code{binned_outputs} and will
+only import data from the main \code{spacerangerOut} directory.}
 
 \item{loadImage}{\code{logical(1)} A single logical value indicating whether to
 load the image data into the resulting \code{SpatialExperiment} object. This
@@ -95,9 +101,10 @@ typically a \code{.parquet} or \code{.csv} file.}
 
 \item{\code{sampleId}}{\code{character(1)} A scalar specifying the sample identifier.}
 
-\item{\code{binSize}}{The bin size of the images to import. The default slot value is
-\code{character()}. It typically corresponds to the directory name
-\code{square_000um} where \code{000} is the bin value.}
+\item{\code{binSize}}{An optional slot to store the image bin size when importing.
+The default slot value is an empty character i.e., \code{""}. When present,
+the value must be a character scalar, e.g., \code{'008'} for 8 microns, and
+will match the directory name e.g., \code{square_008um}.}
 
 \item{\code{loadImage}}{\code{logical(1)} Whether to load the images into memory as
 \code{SpatialImage} objects. If \code{FALSE}, the images are stored as file paths and
@@ -116,5 +123,9 @@ TENxSpatialList(resources = spatial_dir, images = "lowres")
 
 TENxSpatialList(resources = spatial_dir, images = "lowres") |>
     metadata() |> lapply(names)
+
+TENxSpatialList(resources = spatial_dir, images = "lowres") |>
+    import()
+
 
 }

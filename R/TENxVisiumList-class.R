@@ -84,7 +84,7 @@ TENxVisiumList <- function(
         .find_convert_resources,
         processing = processing,
         format = format,
-        bin_size = NULL,
+        bin_size = "",
         type = "bc",
         ...
     )
@@ -99,7 +99,7 @@ TENxVisiumList <- function(
         path = sampleFolders,
         sample_id = sample_ids,
         MoreArgs = list(
-            bin_size = NULL,
+            bin_size = "",
             type = "bc",
             images = images,
             jsonFile = jsonFile,

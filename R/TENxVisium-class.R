@@ -220,10 +220,10 @@ TENxVisium <- function(
                 dir.exists(spacerangerOut)
             )
         resources <-
-            .find_convert_resources(spacerangerOut, processing, format, NULL)
+            .find_convert_resources(spacerangerOut, processing, format, "")
         spatialResource <- .find_convert_spatial(
             path = spacerangerOut,
-            bin_size = NULL,
+            bin_size = "",
             type = "bc",
             sample_id = sample_id,
             images = images,

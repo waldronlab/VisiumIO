@@ -58,9 +58,15 @@ unnecessary when \code{con} is a derivative of \link[BiocIO:BiocFile-class]{Bioc
 \item{images}{\code{character()} A vector specifying the images to be imported;
 can be one or multiple of "lowres", "hires", "detected", "aligned".}
 
-\item{bin_size}{\code{character(1)} The bin size of the images to import. The
-default is \code{008}. It corresponds to the directory name \code{square_000um} where
-\code{000} is the bin value.}
+\item{bin_size}{\code{character(1)} An \emph{optional} scalar indicating the image bin
+size in microns, e.g., \code{'008'} for 8 microns. When provided, the function
+will look for a subfolder in the \code{binned_outputs} folder that corresponds
+to the specified bin size, e.g., \code{square_008um} for an input value of
+\code{'008'}. Bin sizes \code{'002'}, \code{'008'}, and \code{'016'} are typical of the space
+ranger pipeline but custom bin sizes may be used. If the \code{bin_size}
+argument is not provided, it is set to an empty string \code{""} and the
+function will not look for any data in \code{binned_outputs} and will only
+import data from the main \code{spacerangerOut} directory.}
 
 \item{jsonFile}{\code{character(1)} A single string specifying the name of the
 JSON file containing the scale factors.}
@@ -99,7 +105,7 @@ to a connection.}
 providing the string data to import.}
 }
 \value{
-A \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment}
+A \link[SpatialExperiment:SpatialExperiment-class]{SpatialExperiment}
 object
 }
 \description{
@@ -191,6 +197,7 @@ TENxVisiumHD(
     images = "lowres"
 ) |>
     import()
+
 }
 \author{
 E. Y. Dong, M. Ramos

@@ -27,9 +27,10 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'
 #' @slot sampleId `character(1)` A scalar specifying the sample identifier.
 #'
-#' @slot binSize The bin size of the images to import. The default slot value is
-#'   `character()`. It typically corresponds to the directory name
-#'   `square_000um` where `000` is the bin value.
+#' @slot binSize An optional slot to store the image bin size when importing.
+#'   The default slot value is an empty character i.e., `""`. When present,
+#'   the value must be a character scalar, e.g., `'008'` for 8 microns, and
+#'   will match the directory name e.g., `square_008um`.
 #'
 #' @slot loadImage `logical(1)` Whether to load the images into memory as
 #'   `SpatialImage` objects. If `FALSE`, the images are stored as file paths and
@@ -83,9 +84,15 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #'
 #' @inheritParams TENxVisium
 #'
-#' @param bin_size `character(1)` The bin size of the images to import. The
-#'   default is `008`. It corresponds to the directory name `square_000um` where
-#'   `000` is the bin value.
+#' @param bin_size `character(1)` An _optional_ scalar indicating the image bin
+#'   size in microns, e.g., `'008'` for 8 microns. When provided, the function
+#'   will look for a subfolder in the `binned_outputs` folder that corresponds
+#'   to the specified bin size, e.g., `square_008um` for an input value of
+#'   `'008'`. Bin sizes `'002'`, `'008'`, and `'016'` are typical of the space
+#'   ranger pipeline but custom bin sizes may be used. If the `bin_size`
+#'   argument is not provided, it is set to an empty character value i.e., `""`
+#'   and the function will not look for any data in `binned_outputs` and will
+#'   only import data from the main `spacerangerOut` directory.
 #'
 #' @importFrom BiocIO decompress
 #'
@@ -102,6 +109,10 @@ S4Vectors::setValidity2("TENxSpatialList", .validTENxSpatialList)
 #' TENxSpatialList(resources = spatial_dir, images = "lowres") |>
 #'     metadata() |> lapply(names)
 #'
+#' TENxSpatialList(resources = spatial_dir, images = "lowres") |>
+#'     import()
+#'
+#'
 #' @export
 TENxSpatialList <- function(
     resources,
@@ -112,7 +123,7 @@ TENxSpatialList <- function(
     ),
     jsonFile = .SCALE_JSON_FILE,
     tissuePattern = "tissue_positions.*",
-    bin_size = character(0L),
+    bin_size = c("008", "016", "002"),
     loadImage = FALSE,
     ...
 ) {
@@ -130,13 +141,16 @@ TENxSpatialList <- function(
             )
     }
 
-    if (missing(bin_size) && any(grepl("square_\\d{3}", path(resources)))) {
+    if (missing(bin_size) && any(grepl("square_\\d{3}", path(resources))))
         bin_size <- unique(
             gsub(".*?square_(\\d{3}).*", "\\1", path(resources))
         )
-        if (!identical(length(bin_size), 1L))
-            stop("Multiple 'bin_size' values found in the directory")
-    }
+    else if (missing(bin_size))
+        bin_size <- ""
+    else if (!isScalarCharacter(bin_size, zchar = TRUE))
+        stop("The 'bin_size' argument must be a single character value.")
+    else if (!bin_size %in% c("002", "008", "016"))
+        message("Using custom 'bin_size': ", bin_size)
 
     .TENxSpatialList(
         resources, images = images, scaleJSON = jsonFile,
@@ -177,7 +191,7 @@ setMethod("import", "TENxSpatialList", function(con, format, text, ...) {
             prefix = "TENxSpatial", suffix = NULL
         )
         ffcolData <- import(fff)
-        if (length(con@binSize))
+        if (nzchar(con@binSize))
             ffcolData[["bin_size"]] <- con@binSize
         ffcolData <- as(ffcolData, "DataFrame")
         if (length(ffcolData[["barcode"]]))

@@ -4,8 +4,6 @@ setClassUnion("TENxGeoJSON_OR_NULL", c("TENxGeoJSON", "NULL"))
 #' @include TENxParquet-class.R
 setClassUnion("TENxMappingParquet_OR_NULL", c("TENxParquet", "NULL"))
 
-setClassUnion("character_OR_NULL", c("character", "NULL"))
-
 #' @docType class
 #'
 #' @title A class to represent and import multiple Visium HD samples
@@ -33,7 +31,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
     Class = "TENxVisiumHD",
     contains = "TENxVisium",
     slots = c(
-        binSize = "character_OR_NULL",
+        binSize = "character",
         cellseg = "logical",
         geojson = "TENxGeoJSON_OR_NULL",
         boundary = "character",
@@ -41,7 +39,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
     )
 )
 
-.getSpatialPath <- function(path, bin_size = NULL, type = c("bc", "cell")) {
+.getSpatialPath <- function(path, bin_size, type = c("bc", "cell")) {
     type <- match.arg(type)
     squaref <- ""
 
@@ -49,7 +47,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
         out_path <- file.path(path, "outs")
         if (dir.exists(out_path))
             squaref <- "outs"
-        if (!is.null(bin_size)) {
+        if (nzchar(bin_size)) {
             path <- file.path(path, "binned_outputs")
             squaref <- paste0("square_", bin_size, "um")
         }
@@ -99,7 +97,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
     path,
     processing,
     format,
-    bin_size = NULL,
+    bin_size = "",
     type = c("bc", "cell")
 ) {
     type <- match.arg(type)
@@ -144,7 +142,7 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
     path
 }
 
-.find_convert_spatial <- function(path, bin_size, type, ...) {
+.find_convert_spatial <- function(path, bin_size = "", type, ...) {
     if (!is(path, "TENxFileList")) {
         path <- .getSpatialPath(path = path, bin_size = bin_size, type = type)
     } else {
@@ -188,9 +186,15 @@ setClassUnion("character_OR_NULL", c("character", "NULL"))
 #'   the `spatialCoords` and the `nucleus_segmentations` centroids (labeled
 #'   `x.nuc` and `y.nuc`) are added to the `colData` of the returned object.
 #'
-#' @param bin_size `character(1)` The bin size of the images to import. The
-#'   default is `008`. It corresponds to the directory name `square_000um` where
-#'   `000` is the bin value.
+#' @param bin_size `character(1)` An _optional_ scalar indicating the image bin
+#'   size in microns, e.g., `'008'` for 8 microns. When provided, the function
+#'   will look for a subfolder in the `binned_outputs` folder that corresponds
+#'   to the specified bin size, e.g., `square_008um` for an input value of
+#'   `'008'`. Bin sizes `'002'`, `'008'`, and `'016'` are typical of the space
+#'   ranger pipeline but custom bin sizes may be used. If the `bin_size`
+#'   argument is not provided, it is set to an empty string `""` and the
+#'   function will not look for any data in `binned_outputs` and will only
+#'   import data from the main `spacerangerOut` directory.
 #'
 #' @param mappingPattern `character(1)` The `pattern` used in `list.files` that
 #'   identifies the mapping file. The default is `"barcode_mappings\\.parquet"`.
@@ -285,8 +289,14 @@ TENxVisiumHD <- function(
 ) {
     images <- match.arg(images, several.ok = TRUE)
     processing <- match.arg(processing)
-    bin_size <-
-        if (missing(bin_size)) NULL else match.arg(bin_size)
+
+    if (missing(bin_size))
+        bin_size <- ""
+    else if (!isScalarCharacter(bin_size))
+        stop("The 'bin_size' argument must be a single character value.")
+    else if (!bin_size %in% c("002", "008", "016"))
+        message("Using custom 'bin_size': ", bin_size)
+
     format <- match.arg(format)
     boundary <- match.arg(boundary)
     boundaries <-
@@ -325,7 +335,8 @@ TENxVisiumHD <- function(
                 isScalarCharacter(segmented_outputs),
                 dir.exists(segmented_outputs)
             )
-            tissuePattern <- bin_size <- NULL
+            tissuePattern <- NULL
+            bin_size <- ""
             geojson <- TENxGeoJSON(
                 file.path(
                     segmented_outputs, paste0(boundaries, ".geojson")
@@ -402,7 +413,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
     .import_fun <-
         if (con@cellseg)
             .import_cellseg
-        else if (!is.null(con@binSize))
+        else if (nzchar(con@binSize))
             .import_binsize
 
     .import_fun(con)
@@ -471,7 +482,7 @@ setMethod("import", "TENxVisiumHD", function(con, format, text, ...) {
         return(sce)
 
     map <- import(con@mapping)
-    if (!is.null(bin_size)) {
+    if (nzchar(bin_size)) {
         binCol <- grepv(bin_size, names(map), TRUE)
         matches <- match(colnames(sce), map[[binCol]])
         if (length(binCol) && length(matches) && !all(is.na(matches))) {
